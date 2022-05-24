@@ -76,11 +76,37 @@ class ui():
         for img in self.images:
             self.images[img][4] = count
             count+=1
-        print('read all flash/4' , eve.RAM_G_SIZE/4)
-        eve.cmd_flashread(0, 4096, eve.RAM_G_SIZE/4)  # 1024*1024/4 ==256k
-        eve.finish()
+        print('read all flash/8' , eve.RAM_G_SIZE/8)
+        eve.cmd_flashread(0, 4096, eve.RAM_G_SIZE/8)  # 1024*1024/8 ==128k
 
+
+        self.imagesMCU = {
+            # id                 location                                                         ramg address  width  height
+            'background':['audio_play/song_bk_800x480_COMPRESSED_RGBA_ASTC_8x8_KHR.raw',0,800,480],
+        }
+
+        address = 128*1024
+        for index in self.imagesMCU:
+            address = self.round_to_nearest(address, 4)
+            print(address,self.imagesMCU[index])
+            self.imagesMCU[index][1] = address
+            print(address,self.imagesMCU[index])
+            address = self.eve.write_file(address, self.imagesMCU[index][0])
+            print(address)
+
+        eve.finish()
+        self.useBK=1       
         self.render()
+
+    def round_to_nearest(self, n, m):
+        return (n + m - 1) // m * m
+
+    def draw_asset(self, tag, index, x, y,fm):
+        #print(self.imagesMCU[index])
+        helper = self.helper_img
+        helper.image_draw_from_ram_g(self.imagesMCU[index][1],x, y,
+            self.imagesMCU[index][2], self.imagesMCU[index][3],
+            fm, 0, tag, self.eve.OPT_DITHER)
 
     def file_list(self, files):
         self.files = files
@@ -90,7 +116,10 @@ class ui():
         scroller_limit = min(0, -textbox_len + self.file_list_box_h)
         self.helper_scroller.set_limit(0, scroller_limit)
         self.helper_scroller.get_offset_velocity(0)
+        self.file_selected_id=0
+        self.file_playing_id =0
     
+
     def set_playing_file_id(self, fid):
         self.file_playing_id = fid
 
@@ -107,24 +136,26 @@ class ui():
     def render_file_list(self):
         eve = self.eve
         w = eve.lcd_width
-        h = eve.lcd_height
         touch_y = self.helper_gesture.get().touchY
-
+        touch_x = self.helper_gesture.get().touchY
         tag = self.helper_gesture.get().tagPressed
+
         if tag != tag_filelist:
             offset_y, veloc = self.helper_scroller.get_offset_velocity(32768)
             self.files_released = 1
-            #print("tag != tag_filelist",offset_y )
         else:
             offset_y, veloc = self.helper_scroller.get_offset_velocity(touch_y)
-            print("helper_scroller touch_y offset_y isSwipe",touch_y,offset_y  ,self.helper_gesture.get().isSwipe )
+            #print("helper_scroller touch_y offset_y isSwipe",tag,touch_y,offset_y  ,self.helper_gesture.get().isSwipe )
 
 
         box_w = 500
-        x = max(w/2 - box_w/2 , 0)
+        x = max(w/2 - box_w/4 , 0)
+        #x = max(w/2 - box_w/2 , 0)
+        offset_y=_text_playing_box_padding
 
         y = offset_y
         count = -1
+        eve.Tag(tag_filelist)
         for i in self.files:
             y += _text_height
             count +=1
@@ -132,19 +163,19 @@ class ui():
             if y < _text_playing_box_padding: continue
             if y > self.file_list_box_h - _text_playing_box_padding: continue
 
-            if self.helper_gesture.get().isSwipe <=0  \
+            if tag==tag_filelist  \
                and touch_y > y                            \
                and touch_y < y + _text_height:
                     self.file_selected_id_double_tap = -1
                     if self.file_selected_id > -1 and count == self.file_selected_id and self.files_released:
                         # Play a new file
                         self.file_selected_id_double_tap = count
-
                     self.file_selected_id = count
                     self.files_released = 0
                     ms = time.monotonic_ns() / 1000_000
                     self.selected_timeout = ms
-                    print("selected count,touch_y offset_y isSwipe",count,touch_y,offset_y  ,self.helper_gesture.get().isSwipe )
+                    self.files_released = 1
+                    #print("selected count,touch_y offset_y isSwipe",tag,count,touch_y,offset_y  ,self.helper_gesture.get().isSwipe )
 
             if self.files[self.file_playing_id] == i:
                 eve.ColorRGB(0, 255, 0)
@@ -152,6 +183,8 @@ class ui():
                 eve.ColorRGB(255, 255, 255)
             eve.cmd_text(x, y, _text_font, 0, i)
         eve.ColorRGB(255, 255, 255)
+        eve.Tag(0)
+
 
         if self.file_selected_id > -1:
             timeout = 2000
@@ -224,31 +257,37 @@ class ui():
         w = eve.lcd_width
         h = eve.lcd_height
 
-        # app background
-        widgets_box(eve, -10, -10, w + 20, h + 20, 10, [0x1A, 0x1A, 0x1A])
-        
-        # file list box
-        widgets_box(eve, 10    , 0, w - 20    , 10 + self.file_list_box_h    , 10, [0x19, 0x19, 0x19])
-        widgets_box(eve, 10 + 1, 1, w - 20 - 2, 10 + self.file_list_box_h - 2, 8 , [0x28, 0x28, 0x28])
-        widgets_box(eve, 10 + 2, 2, w - 20 - 4, 10 + self.file_list_box_h - 4, 6 , [0x1d, 0x1d, 0x1d])
-        widgets_box(eve, 10 + 3, 3, w - 20 - 6, 10 + self.file_list_box_h - 6, 4 , [0x00, 0x00, 0x00], tag_filelist)
+        if self.useBK:
+            self.draw_asset(0,"background",0,0,self.eve.ASTC_8x8)
+        eve.ColorA(200)   
+        if 1:
+            # app background
+            widgets_box(eve, -10, -10, w + 20, h + 20, 10, [0x1A, 0x1A, 0x1A])
+            
+            # file list box
+            #widgets_box(eve, 125    , 0, w - 250    , 10 + self.file_list_box_h    , 10, [0x19, 0x19, 0x19])
+            #widgets_box(eve, 125+1, 1, w - 250 - 2, 10 + self.file_list_box_h - 2, 8 , [0x28, 0x28, 0x28])
+            widgets_box(eve, 125+2, 2, w - 250 - 4, 10 + self.file_list_box_h - 4, 6 , [0x1d, 0x1d, 0x1d])
+            #widgets_box(eve, 125+3, 3, w-250-6, 10 + self.file_list_box_h - 6, 4 , [0x00, 0x00, 0x00], tag_filelist)
 
-        eve.ColorRGB(255, 255, 255)
-        self.draw_img('circle_92x92_1', tag_next)
-        self.draw_img('circle_92x92_2', tag_prev)
-        self.draw_img('circle_92x92_3',tag_play)
-        self.draw_img('circle_92x92_4', tag_stop)
-        #self.draw_img(self.loop_icon, tag_loop)
-        #self.draw_img(self.random_icon, tag_random)
-        self.draw_img('next_36x28', tag_next)
-        #print('tag_play', tag_play, tag_pause)
-        self.draw_img(self.play_icon, tag_play)
-        self.draw_img('prev_36x28' , tag_prev)
-        self.draw_img('stop_36x28' , tag_stop)
-        eve.Tag(tag_Back)
-        eve.cmd_button(700, 300, 85,35,30, 0, "Back")
-        eve.Tag(0)
-        
+            eve.ColorRGB(255, 255, 255)
+            self.draw_img('circle_92x92_1', tag_next)
+            self.draw_img('circle_92x92_2', tag_prev)
+            self.draw_img('circle_92x92_3',tag_play)
+            self.draw_img('circle_92x92_4', tag_stop)
+            #self.draw_img(self.loop_icon, tag_loop)
+            #self.draw_img(self.random_icon, tag_random)
+            self.draw_img('next_36x28', tag_next)
+            #print('tag_play', tag_play, tag_pause)
+            self.draw_img(self.play_icon, tag_play)
+            self.draw_img('prev_36x28' , tag_prev)
+            self.draw_img('stop_36x28' , tag_stop)
+            eve.Tag(tag_Back)
+            eve.cmd_button(700, 5, 85,35,30, 0, "Back")
+            eve.Tag(0)
+
+
+
         self.render_file_list()
         self.render_volume()
         self.render_scroller()

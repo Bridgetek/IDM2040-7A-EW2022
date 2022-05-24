@@ -41,9 +41,7 @@ class audio_play():
         self.audio_eve.set_volume(self.vol)
 
         # get .wav list
-        #self.media_location='/sd/pico-brteve/circuitPython/examples/audio-playback/media'
-        self.media_location='pico-brteve/circuitPython/examples/audio-playback/media'
-
+        self.media_location='pico-brteve/circuitPython/examples/audio-play/media'
         #mkdir pico-brteve\circuitPython\examples\audio-playback\media
 
         self.wfiles = {
