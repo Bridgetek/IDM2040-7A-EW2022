@@ -72,16 +72,10 @@ class dmx_ui(object):
             self.images[img][4] = count
             count+=1
             iamge=self.images[img]
-#             addr=int(iamge[0])
-#             if addr>=0:
-#                 print(img,iamge)
-#                 eve.cmd_flashread(iamge[0], iamge[0], iamge[1])
             
         img = self.images['circular_colorwheel']
         print(img)
         eve.cmd_flashread(img[0], img[0]+4096, img[1])  
-
-#        eve.cmd_flashread(0, 4096, eve.RAM_G_SIZE/4)  # 1024*1024/4 ==256k  
         eve.finish()
 
         self.tWhitePercent=50
@@ -112,40 +106,7 @@ class dmx_ui(object):
             ((1.0, 1.0, 1.0), (  0  , 0.0, 1.0)), # white
             ((0.5, 0.5, 0.5), (  0  , 0.0, 0.5)), # grey
         ]
-#         for (rgb, hsv) in values:
-#             rgb1=self.hsv_to_rgb(hsv[0],hsv[1],hsv[2])
-#             print(rgb,rgb1)
-#             rgb2=self.hsvToRgb(hsv[0],hsv[1],hsv[2])
-#             print("rgb2",rgb,rgb2)       
 
-    def hsvToRgb(self , h,  s,  v):
-        r, g, b=0,0,0
-        R, G, B=0,0,0
-        h = h / 360.0;
-        v = v / 255.0;
-        i = (int)(h * 6);
-        f = h * 6 - i;
-        p = v * (1 - s);
-        q = v * (1 - f * s);
-        t = v * (1 - (1 - f) * s);
-        ss=(i % 6)
-        print("ss",ss)
-        if ss==0:
-           r = v; g = t;b = p
-        elif ss==1:
-           r = q; g = v; b = p
-        elif ss==2:
-           r = p; g = v; b = t
-        elif ss==3:
-           r = p; g = q; b = v
-        elif ss==4:
-           r = t; g = p; b = v
-        elif ss==5:
-           r = v; g = p; b = q
-        R = (int)(r * 255.0);
-        G = (int)(g * 255.0);
-        B = (int)(b * 255.0);
-        return  ( (R << 16) , (G << 8), B)
  
 
         
@@ -284,10 +245,8 @@ class dmx_ui(object):
         self.dmx.setStart4ch(self.addrDMX,self.rgb[1], self.rgb[0], self.rgb[2] ,int(self.tWhitePercent*2.55))
         touch_ges = gesture(self.eve)
         while True:
-            eve.cmd_dlstart() #  cause problem
+            eve.cmd_dlstart() 
             eve.VertexFormat(2)
- 
-            #eve.cmd_dlstart()
             eve.ClearColorRGB(0, 0, 0)   # 255-> 1   ,new black color
             eve.Clear(1, 1, 1) 
             eve.ColorRGB(0xff, 0xff, 0xff)
@@ -320,7 +279,6 @@ class dmx_ui(object):
             eve.Vertex2f(self.x0, self.y0)
 
             eve.TagMask(0)
-            #eve.ColorRGB((int)(tRedPercent*2.55), (int)(tGreenPercent*2.55), (int)(tBluePercent*2.55))
             eve.ColorRGB(self.rgb[0], self.rgb[1], self.rgb[2])
             eve.Begin(eve.RECTS)
             eve.LineWidth(5)
@@ -359,9 +317,12 @@ class dmx_ui(object):
             t+=1
             #print(t)
         print("clear")
-        eve.cmd_dlstart() #  cause problem
+        self.rgb=(0,0,0)
+        self.tWhitePercent=0
+        self.writeOneFrame(self.rgb,self.tWhitePercent)
+        eve.cmd_dlstart() 
         eve.VertexFormat(2)
-        eve.ClearColorRGB(0, 0, 0)   # 255-> 1   ,new black color
+        eve.ClearColorRGB(0, 0, 0)   
         eve.Clear(1, 1, 1) 
         eve.ColorRGB(0xff, 0xff, 0xff)
         eve.cmd_fgcolor(0x003870)  # default
