@@ -59,7 +59,7 @@ class blinka_rotate(object):
 
     def run(self):
         gd =self.eve
-        assetdir = "IDM2040_demo/"
+        assetdir = "blinka/"
         self.setup_circular()
         gd.cmd_dlstart()  
         gd.BitmapHandle(0)

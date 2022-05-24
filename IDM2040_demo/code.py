@@ -1,4 +1,4 @@
-from IDM2040_demo.tags_all import *
+from main_menu.tags_all import *
 import microcontroller
 import watchdog
 import time
@@ -101,7 +101,7 @@ class main_app():
         eve = self.eve
         if tag == tag_cube_demo:
                 print("tag_cube_demo")
-                from IDM2040_demo.cube import cube 
+                from cube.cube import cube 
                 #del eve
                 #eve.deinit()
                 #eve.init(resolution="800x480", touch="capacity")
@@ -111,7 +111,7 @@ class main_app():
                 print("tag_blinka_dema")
                 #del eve
                 #eve.init(resolution="800x480", touch="capacity")
-                from IDM2040_demo.blinka_rotate import blinka_rotate  
+                from blinka.blinka_rotate import blinka_rotate  
                 blinka_rotate(eve).run()
 
         elif tag == tag_dmx512_demo:
@@ -191,22 +191,10 @@ class main_app():
 if __name__ == '__main__':
     mainMenu=main_app()
     mainMenu.showFreeMem()
- 
-    wdt = microcontroller.watchdog
-    #wdt.timeout = 3
-    #wdt.mode = watchdog.WatchDogMode.RAISE #Currently on RP2040, RAISE mode is not implemented
-    #wdt.mode = watchdog.WatchDogMode.RESET
     try:
         while 1:
             mainMenu.loop()
-            #wdt.feed()
-    except watchdog.WatchDogTimeout as e:
-        print("Watchdog expired")
     except Exception as e:
         print("Other exception:",e)
         microcontroller.reset()
-
-
-
-
 

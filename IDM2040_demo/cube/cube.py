@@ -333,7 +333,7 @@ class cube:
         eve.cmd_dlstart()
  
         eve.cmd_loadimage(0, 0)
-        eve.load(open("IDM2040_demo/healsky3.jpg", "rb"))
+        eve.load(open("cube/healsky3.jpg", "rb"))
         print("width = {0}, height = {1}".format(eve.lcd_width, eve.lcd_height))
         eve.BitmapHandle(0)
         eve.BitmapSize(eve.NEAREST, eve.BORDER, eve.BORDER, eve.lcd_width, eve.lcd_height)
