@@ -1,5 +1,4 @@
-"""The Raspberry Pi Pico is a low-cost, high-performance microcontroller
-   board with flexible digital interfaces"""
+# Changed to use self lib brt_eve_rp2040_dmx.py instead of changing original   brt_eve_rp2040.py
 import os
 import board
 import busio
