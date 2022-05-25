@@ -7,11 +7,8 @@ from .layout import layout
 from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_common import ui_common
 from .ui_config import ui_config
-#from .ui_main import ui_main
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -32,35 +29,14 @@ class ui_relay(ui_config):
         self.title="LDS 2Ch Relay"
         self.ldsuid=-1
         self.lds_json=None
-        self.relay_state=[ True, False ]
-        
+        self.relay_state=[ True, False ]       
         self._clearData=True
         self._histroy=[]
         self._maxLen=10
-
         self.hFanOn=5
         self.hFanOff=6
-        assetdir = "ui_lds/"
-#         bmAdd=1024*250        
-#         print("hFanOn bmAdd %x"%(bmAdd) )
-#         eve.cmd_dlstart() #  cause problem
-#         eve.BitmapHandle(self.hFanOn)
-#         eve.cmd_loadimage(bmAdd, 0)
-#         eve.load(open(assetdir + "fanon.png", "rb"))
-# 
-#         
-#         bmAdd=1024*280
-#         print("hFanOff bmAdd %x"%(bmAdd) )
-#         eve.BitmapHandle(self.hFanOff)
-#         eve.cmd_loadimage(bmAdd, 0)
-#         eve.load(open(assetdir + "fanoff.png", "rb"))
-        eve.cmd_swap()
-
-        self.milis_start = 0
-        self.milis_stop = 0
-        self.running = 0
-        self.pause = 0
-        self.split = []
+        self.relayStatus={'Relay - CH 1':'1','Relay - CH 2':'0' ,'Current - CH 1':'0.000','Current - CH 2':'0.051'}
+        self.last_timeout =  time.monotonic_ns() / 1000_000
  
     def interrupt(self):
         return 0
@@ -68,36 +44,14 @@ class ui_relay(ui_config):
     def drawBtn(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)
-
         y = self.layout.APP_Y 
         btn_w = self.btn_w
         btn_h = self.btn_h
-
-        xmargin =self.xmargin
         x1 = self.xStart
-
-        x2 = x1 + btn_w + xmargin
-        x3 = x2 + btn_w + xmargin
-        x4 = x3 + btn_w + xmargin
-        x5 = x4 + btn_w + xmargin
-
-        x2 = x1 + btn_w + xmargin
-        x3 = x2 + btn_w + xmargin
-        x4 = x3 + btn_w + xmargin
-        x5 = x4 + btn_w + xmargin
-        if ( self.debug):
-            eve.Tag(tag_ui_lds_home)
-            eve.cmd_button(x1, y, btn_w, btn_h, 30, 0, "Home")
-            eve.Tag(tag_ui_lds_reset_data)
-            eve.cmd_button(x2, y, btn_w, btn_h, 30, 0, "Reset")
-            eve.Tag(tag_ui_lds_data_text)
-            eve.cmd_button(x3, y, btn_w, btn_h, 30, 0, "Text")
-            eve.Tag(tag_ui_lds_data_gui)
-            eve.cmd_button(x4, y, btn_w, btn_h, 30, 0, "GUI")
-
+        x5 = x1 + 310
         eve.Tag(tag_ui_lds_back)
-        eve.cmd_button(x5, y, btn_w, btn_h, 30, 0, "Back")
-        eve.TagMask(0) #The value zero means the tag buffer is set as the default value, rather than the value given by TAG command in the display list
+        eve.cmd_button(x5, y, btn_w, btn_h, 31, 0, "Back")
+        eve.Tag(0)
 
     def event(self):
         eve = self.eve
@@ -153,7 +107,14 @@ class ui_relay(ui_config):
     def processOne(self,lds,x,y):
             eve = self.eve
             distance = 30
+            y1=y+70
+            y2=y+280
+            x1=x+120
+            x2=x+520
+            x3=x+150
+            x4=x+550
             ldsuid = int(lds['DID'])
+            counter=0
             if self.firstTime:  
                 #self.firstTime=False;
                 print("ldsuid:",ldsuid, "OBJ:",lds['OBJ'] ," lds:",lds)
@@ -169,72 +130,67 @@ class ui_relay(ui_config):
                 for said, sensor in enumerate(lds_json['SNS']):
                     time.sleep(0.01)
                     if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
-
                         sns_value = self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
                         #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
                         if self.firstTime:print ("DID=%d %20s :type:%s %s "%  (ldsuid,sensor['NAME'],  sensor['TYPE'],sns_value) )
                         if sns_value is not None:
-                            #print("%s\n"%(sns_value ) )
-                            self.eve.TagMask(1)
-                            if sensor['NAME']=='Relay - CH 1':
-                                vv=sns_value['VALUE']
+                            vv=sns_value['VALUE']
+                            if self.relayStatus[sensor['NAME']] != vv:
+                                self.relayStatus[sensor['NAME']]=vv
+                                print("%s changed  %s" % (sensor['NAME'],self.relayStatus[sensor['NAME']] ))
+                            counter+=1
+            for name in self.relayStatus:
+                            vv=self.relayStatus[name]
+                            if name=='Relay - CH 1':
                                 eve.Tag(tag_ui_lds_relay_ch1)
-                                ss=0
                                 if vv=='0':
-                                    ss=0
-                                    self.layout.draw_asset4(tag_ui_lds_relay_ch1,"fanOff",x+120,y+100) 
+                                    self.layout.draw_asset4(tag_ui_lds_relay_ch1,"fanOff",x1,y1) 
                                 elif vv=='1':
-                                    ss=65535
-                                    self.layout.draw_asset4(tag_ui_lds_relay_ch1,"fanOn",x+120,y+100)   
-                            if sensor['NAME']=='Relay - CH 2': 
-                                vv=sns_value['VALUE']
+                                    self.layout.draw_asset4(tag_ui_lds_relay_ch1,"fanOn",x1,y1)   
+                                eve.Tag(0)
+                            elif name=='Relay - CH 2': 
                                 eve.Tag(tag_ui_lds_relay_ch2)
-                                ss=0
                                 if vv=='0':
-                                    ss=0
-                                    self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOff",x+520,y+100) 
+                                    self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOff",x2,y1) 
                                 elif vv=='1':
-                                    ss=65535
-                                    self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOn",x+520,y+100) 
+                                    self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOn",x2,y1) 
+                                eve.Tag(0)
+                            elif name=='Current - CH 1': 
+                                eve.cmd_text(x3,y2, 31, 0, "%s A"%vv)
+                            elif name=='Current - CH 2': 
+                                eve.cmd_text(x4,y2, 31, 0, "%s A"%vv)
+
+
+            if counter<4:
+                print ("Error when reading Relay Data:%d"%  ( counter) )
+
   
                          
             if self.firstTime:  
-                self.firstTime=False;
+                self.firstTime=False
                    
     def draw(self):
         eve = self.eve
+        ms = time.monotonic_ns() / 1000_000
+        if ms - self.last_timeout < self.timeout: return
+        self.last_timeout =  time.monotonic_ns() / 1000_000
         layout = self.layout
         helper=self.helper
-        eve.ColorRGB(0xff, 0xff, 0xff)
-        
-        x = 10
-        y = 10
-        FONTSIZE = 18
-        btn_w = 60
-        btn_h = 30
-
-        eve.cmd_text(x, y, 28, 0, self.title)
-
+        eve.ColorRGB(0xff, 0xff, 0xff)       
+        x = self.x0
+        y = self.y0
+        FONTSIZE = 29
+        eve.cmd_text(x, y, 31, 0, self.title)
         eve.Tag(tag_ui_lds_info)
-        eve.cmd_button(x+len(self.title)*FONTSIZE, y, btn_w, btn_h, 30, 0, "Info")
-
-        if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)
-
-        
+        eve.cmd_button(x+len(self.title)*FONTSIZE, y, self.btn_w, self.btn_h, 31, 0, "Info")
+        if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)        
         self.drawBtn()
         self.event()
-
         ymargin = 50
         y +=  ymargin
-        widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])
-        
-
+        widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])        
         eve.ColorRGB(255, 255, 255)
-
         y +=  ymargin
-
         eve.cmd_text(x+100, y, 31, 0, "Channel 1")
-
         eve.cmd_text(x+500, y, 31, 0, "Channel 2")
- 
         self.processOne(self.LDSBus_Sensor.lds,x,y)

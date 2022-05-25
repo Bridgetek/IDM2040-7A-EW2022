@@ -86,7 +86,7 @@ class ui_common(ui_config):
             _y-=space_y
 
 #temperature
-    def Progress_box(self, x, y, w, h, border, title, unit, vmin, vmax, warning, value):
+    def Progress_box(self, x, y, w, h, border, title, unit, vmin, vmax, warning, value,scale=1):
         e=self.eve
 
         color = self._COLOR_GREEN
@@ -97,17 +97,8 @@ class ui_common(ui_config):
         if vmin > value:
             return
 
-        e.ColorRGB(255, 255, 255)
-        e.Begin(e.RECTS)
-        e.LineWidth(10)
-        e.Vertex2f(x, y)
-        e.Vertex2f(x + w, y + h)
-
-        e.ColorRGB(0, 0, 0)
-        e.Begin(e.RECTS)
-        e.LineWidth(10)
-        e.Vertex2f(x + border, y + border)
-        e.Vertex2f(x + w - border, y + h - border)
+        if scale==1:
+            self.box(x, y, w+20, h, border,0,scale)
 
         _padding = 20
         _x=x+_padding
@@ -140,7 +131,8 @@ class ui_common(ui_config):
         char_w_1 = 18
         char_w_2 = char_w_1 + 25
         e.ColorRGB(255, 255, 255)
-        e.cmd_text(x + 3, y + 3, 21, 0, title)
+        if scale==1:e.cmd_text(x + 3, y + 3, 21, 0, title)
+        else:e.cmd_text(x + 3, y + 3, 31, 0, title)
         e.cmd_text(x + (w / 2), _y - 70, 31, e.OPT_RIGHTX, str(round(value, 1)))
         #e.cmd_text(x + (w / 2) + char_w_1, _y - 60, 18, e.OPT_RIGHTX, "o")
         e.cmd_text(x + (w / 2) + char_w_2, _y - 70, 31, e.OPT_RIGHTX, unit)
@@ -166,7 +158,7 @@ class ui_common(ui_config):
 
 #circle_box
     def circle_box(self,
-            x, y, w, h, border, title, unit, vmin, vmax, lwarning, hwarning, value,tsize=29):
+            x, y, w, h, border, title, unit, vmin, vmax, lwarning, hwarning, value,tsize=29,scale=1):
         e=self.eve
 
         color = self._COLOR_GREEN
@@ -174,8 +166,8 @@ class ui_common(ui_config):
             color = self._COLOR_WARNING
         percent = value / vmax * 100
 
-        # box
-        self.box(x, y, w, h, border)
+        if scale==1:
+            self.box(x, y, w+20, h, border,0,scale)
 
         # circle view
         _skip_range = 50 # degree
@@ -247,7 +239,8 @@ class ui_common(ui_config):
         e.StencilOp(e.KEEP, e.KEEP)
 
         e.ColorRGB(255, 255, 255)
-        e.cmd_text(x + 3, y + 3, 21, 0, title)
+        if scale==1:e.cmd_text(x + 3, y + 3, 21, 0, title)
+        else:e.cmd_text(x + 3, y + 3, 31, 0, title)
         e.cmd_text(x + (w / 2), _y - 5, tsize, e.OPT_CENTER, str(round(value, 1)))
         e.cmd_text(x + (w / 2), _y + 25, 23, e.OPT_CENTER, unit)
 
@@ -346,55 +339,6 @@ class ui_common(ui_config):
 
         return rounded_vmin, now_hh, now_mm
 
-    ''' 
-    last_push_humidity = 0
-    def push_humidity(self, value):
-        now = time.monotonic_ns()
-        TIME_PATTERN= 1 #second
-        if now - self.last_push_humidity < TIME_PATTERN *1e9:
-            #pass
-            return
-
-        self.last_push_humidity = now
-
-        timestamp = time.monotonic_ns() / 1e9
-        data = [timestamp, value]
-
-        try:
-            # new data on top
-            temp=self.humidity_data[0:self.HUMIDITY_MAX_SAMPLE] # get index from 0 to max-1
-            self.humidity_data = [data] + temp                  # add value to top
-
-            if self.humidity_sample_num < self.HUMIDITY_MAX_SAMPLE:
-                self.humidity_sample_num += 1
-        except  Exception as e:
-            print("exceprion:",e)
-            print("len:%d humidity_sample_num %d"%(len(self.humidity_data),self.humidity_sample_num) )
-
-    last_push_temperature  = 0
-    def push_temperature (self, value):
-        now = time.monotonic_ns()
-        TIME_PATTERN= 1 #second
-        if now - self.last_push_temperature < TIME_PATTERN *1e9:
-            #pass
-            return
-
-        self.last_push_temperature = now
-
-        timestamp = time.monotonic_ns() / 1e9
-        data = [timestamp, value]
-
-        try:
-            # new data on top
-            temp=self.temperature_data[0:self.temperature_MAX_SAMPLE] # get index from 0 to max-1
-            self.temperature_data = [data] + temp                  # add value to top
-
-            if self.temperature_sample_num < self.temperature_MAX_SAMPLE:
-                self.temperature_sample_num += 1
-        except  Exception as e:
-            print("exceprion:",e)
-            print("len:%d humidity_sample_num %d"%(len(self.temperature_data),self.temperature_sample_num) )
-    '''
 
     def set_temp(self, value):
         self.temp_value = value
@@ -425,10 +369,13 @@ class ui_common(ui_config):
         '''
 
         # box
-        self.box(x, y, w, h, border,0,scale)
+        if scale==1:
+            self.box(x, y, w+20, h, border,0,scale)
+        else: self.box(x, y, w, h, border,0,scale)
 
         e.ColorRGB(255, 255, 255)
-        e.cmd_text(x + 3, y + 3, 21, 0, "Humidity(%)")
+        if scale==1:e.cmd_text(x + 3, y + 3, 21, 0, "Humidity(%)")
+        else: e.cmd_text(x + 3, y + 3, 28, 0, "Humidity(%)")
 
         # Rows
         row_offsetx = x + PADDING_X+5
@@ -506,7 +453,8 @@ class ui_common(ui_config):
             e.End()
         if tvalue!=0:
             e.ColorRGB(self._COLOR_GREEN[0],self._COLOR_GREEN[1],self._COLOR_GREEN[2])
-            e.cmd_text(x + w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
+            if scale==1:e.cmd_text(x + w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
+            else:e.cmd_text(x + w/2, y + 3, 28, 0, "%3.1f"%( tvalue) )
     def gradien_Scissor(self,x, y, w, h, border):
         eve = self.eve
         #print("gradien_Scissor",x,y,w,h)
@@ -547,202 +495,6 @@ class ui_common(ui_config):
                     [0x3b8201, 0x27751b],
                 ]
         '''
-    def statitics_gradien(self, x, y, w, h, border, data=bytearray()):
-        """ data = [[0=(timestamp) time), 1=(int) value)], ...], data from last 10 minute
-        """
-        e = self.eve
-
-        MEASURE_MINUTE_MAX = 1 # QF 3-->1
-        ROW_NUM = 6  #QF
-        ROW_LINE = ROW_NUM + 1
-        PADDING_Y = PADDING_X = 30
-        ANGLE = 35
-        FONTSIZE = 16
-
-        num_mins, now_hh, now_mm = self.last_min(MEASURE_MINUTE_MAX)
-        _second_gap = self.second_gaps()
-        if _second_gap >= 0:
-            num_mins +=1
-
-        # box
-        self.box(x, y, w, h, border)
-
-        e.ColorRGB(255, 255, 255)
-        e.cmd_text(x + 3, y + 3, 21, 0, "Temperature")
-
-        # Rows
-        row_offsetx = x + PADDING_X
-        row_offsety = y + PADDING_Y
-        ROW_HEIGHT = (h/2) / ROW_NUM
-        e.LineWidth(1)
-
-        row_offsetyMax=row_offsetx
-        for i in range(ROW_NUM+1):
-            e.Begin(e.LINES)
-            _y=row_offsety + i*ROW_HEIGHT
-            e.Vertex2f(row_offsetx     , _y)
-            e.Vertex2f(x+w    , _y)
-            e.cmd_text(x + 10 , _y - 5, 16, 0, str(35 - i*5))   #100-->35  QF
-            row_offsetyMax=_y
-
-
-        # Columns
-        col_offset = row_offsetx + 20
-        row_len = x + w - col_offset
-        col_num = num_mins
-        col_w = row_len / num_mins
-        hh, mm = now_hh, now_mm
-        _x_gaps = col_w * _second_gap / 60 # how much second passed from last minute?
-        for i in range(col_num):
-            e.Begin(e.LINES)
-            _x= x + w - i*col_w - _x_gaps
-
-            e.Vertex2f(_x, row_offsety)
-            e.Vertex2f(_x, row_offsety + ROW_LINE * ROW_HEIGHT - ROW_HEIGHT/2)
-
-            # _time_str = "19:20 am"
-            tm = self._time_str(hh, mm, 0)
-            if i != 0:
-                hh, mm, tm = self._time_str(hh, mm, 1)
-            self.rotate_str_up(tm, ANGLE, FONTSIZE, 0, _x - 50,
-                row_offsety + ROW_LINE * ROW_HEIGHT + 25)
-
-        # line strips
-        MAX_TIME = num_mins * 60 #second
-        W_PER_S = row_len / MAX_TIME # width pixel per second
-        H_PER_V = (ROW_HEIGHT * ROW_NUM) / (50-10) # height pixel per second, range from 10- to 50  #QF
-        if self.temperature_sample_num > 0:
-            t0 = data[0][0]
-            e.ColorRGB(self._COLOR_GREEN[0], self._COLOR_GREEN[1], self._COLOR_GREEN[2])
-            e.Begin(e.LINE_STRIP)
-            e.LineWidth(4)
-
-            for i in range(self.temperature_sample_num):
-                d = data[i]
-                t=d[0]
-                v=d[1] - 10 # start from  10   #QF
-
-                # skip if invalid data
-                if v < 0 or v > 100:
-                    continue
-
-                gap = t0 - t # gaps in second
-                if gap > ((MEASURE_MINUTE_MAX + 1) * 60 + 10):
-                    break
-
-                _x = x + w - W_PER_S * gap
-                _y = y + PADDING_Y + ROW_HEIGHT*ROW_NUM - H_PER_V*v
-                if _x < row_offsetx:
-                    break
-                #e.Vertex2f(_x, _y)
-                _x0 = x + w 
-                _y0 = y + PADDING_Y + ROW_HEIGHT*ROW_NUM 
-                h=row_offsetyMax-(_y)
-                #print("row_offsetyMax ",i,row_offsetyMax,_y)
-                self.gradien_Scissor(_x,row_offsetyMax,1,round(h),1)
-                #e.Vertex2f(_x, _y)
-                #e.Vertex2f(_x, _y0)
-            #self.eve.Display()
-            #self.eve.cmd_swap()
-            e.End()
-    def statitics_boxH(self, x, y, w, h, border, data=bytearray()):
-        """ data = [[0=(timestamp) time), 1=(int) value)], ...], data from last 10 minute
-        """
-        e = self.eve
-
-        MEASURE_MINUTE_MAX = 1 # QF 3-->1
-        ROW_NUM = 6  #QF
-        ROW_LINE = ROW_NUM + 1
-        PADDING_Y = PADDING_X = 30
-        ANGLE = 35
-        FONTSIZE = 16
-
-        num_mins, now_hh, now_mm = self.last_min(MEASURE_MINUTE_MAX)
-        _second_gap = self.second_gaps()
-        if _second_gap >= 0:
-            num_mins +=1
-
-        # box
-        self.box(x, y, w, h, border)
-
-        e.ColorRGB(255, 255, 255)
-        e.cmd_text(x + 3, y + 3, 21, 0, "Temperature")
-
-        # Rows
-        row_offsetx = x + PADDING_X
-        row_offsety = y + PADDING_Y
-        ROW_HEIGHT = (h/2) / ROW_NUM
-        e.LineWidth(1)
-
-        row_offsetyMax=row_offsetx
-        for i in range(ROW_NUM+1):
-            e.Begin(e.LINES)
-            _y=row_offsety + i*ROW_HEIGHT
-            e.Vertex2f(row_offsetx     , _y)
-            e.Vertex2f(x+w    , _y)
-            e.cmd_text(x + 10 , _y - 5, 16, 0, str(35 - i*5))   #100-->45  QF
-            row_offsetyMax=_y
-
-
-        # Columns
-        col_offset = row_offsetx + 20
-        row_len = x + w - col_offset
-        col_num = num_mins
-        col_w = row_len / num_mins
-        hh, mm = now_hh, now_mm
-        _x_gaps = col_w * _second_gap / 60 # how much second passed from last minute?
-        for i in range(col_num):
-            e.Begin(e.LINES)
-            _x= x + w - i*col_w - _x_gaps
-
-            e.Vertex2f(_x, row_offsety)
-            e.Vertex2f(_x, row_offsety + ROW_LINE * ROW_HEIGHT - ROW_HEIGHT/2)
-
-            # _time_str = "19:20 am"
-            tm = self._time_str(hh, mm, 0)
-            if i != 0:
-                hh, mm, tm = self._time_str(hh, mm, 1)
-            self.rotate_str_up(tm, ANGLE, FONTSIZE, 0, _x - 50,
-                row_offsety + ROW_LINE * ROW_HEIGHT + 25)
-
-        # line strips
-        MAX_TIME = num_mins * 60 #second
-        W_PER_S = row_len / MAX_TIME # width pixel per second
-        H_PER_V = (ROW_HEIGHT * ROW_NUM) / (50-10) # height pixel per second, range from 10- to 50  #QF
-        if self.temperature_sample_num > 0:
-            t0 = data[0][0]
-            #e.ColorRGB(self._COLOR_GREEN[0], self._COLOR_GREEN[1], self._COLOR_GREEN[2])
-            e.ColorRGB(self._COLOR_YELLOW[0], self._COLOR_YELLOW[1], self._COLOR_YELLOW[2])
-            e.Begin(e.LINE_STRIP)
-            e.LineWidth(4)
-
-            for i in range(self.temperature_sample_num):
-                d = data[i]
-                t=d[0]
-                v=d[1] - 10 # start from  10   #QF
-
-                # skip if invalid data
-                if v < 0 or v > 100:
-                    continue
-
-                gap = t0 - t # gaps in second
-                
-                if gap > ((MEASURE_MINUTE_MAX + 1) * 60 + 10):
-                    break
-
-                _x = x + w - W_PER_S * gap
-                _y = y + PADDING_Y + ROW_HEIGHT*ROW_NUM - H_PER_V*v
-                if _x < row_offsetx:
-                    break
-
-                h=row_offsetyMax-(_y)
-                #self.gradien_Scissor(_x,row_offsetyMax,1,round(h),1)
-                e.Vertex2f(_x, _y)
-                e.Vertex2f(_x, _y+h)
-                #if (i==(self.temperature_MAX_SAMPLE-1)) or (i==(self.temperature_sample_num-1)):print("t max",i,_x,_y,h)
-            #self.eve.Display()
-            #self.eve.cmd_swap()
-            e.End()
     def coordinateMarker(self,x,y,w,h,border,scale=1,blend=0,tvalue=0):
         eve = self.eve
 
@@ -766,14 +518,15 @@ class ui_common(ui_config):
 
         if border==1:
             # big border
+            m=20
             eve.ColorRGB(255, 255, 255)
             eve.Begin(eve.LINES)
             eve.LineWidth(1)
             eve.Vertex2f(x , y )
-            eve.Vertex2f(x+w , y )
-            eve.Vertex2f(x+w , y )
-            eve.Vertex2f(x+w , y+h )
-            eve.Vertex2f(x+w , y+h )
+            eve.Vertex2f(x+w+m, y )
+            eve.Vertex2f(x+w+m , y )
+            eve.Vertex2f(x+w+m , y+h )
+            eve.Vertex2f(x+w+m , y+h )
             eve.Vertex2f(x , y+h )
             eve.Vertex2f(x , y+h )
             eve.Vertex2f(x , y  )    
@@ -785,7 +538,8 @@ class ui_common(ui_config):
 
 
         eve.ColorRGB(255, 255, 255)
-        eve.cmd_text(x + 3, y + 3, 21, 0, "Temperature(Degree)")
+        if scale==1:eve.cmd_text(x + 3, y + 3, 21, 0, "Temperature(Degree)")
+        else:eve.cmd_text(x + 3, y + 3, 28, 0, "Temperature(Degree)")
 
 
         # Rows
@@ -840,7 +594,8 @@ class ui_common(ui_config):
             #print("row_len,i,_x",row_len,i,_x)
         if tvalue!=0:
             eve.ColorRGB(self._COLOR_GREEN[0],self._COLOR_GREEN[1],self._COLOR_GREEN[2])
-            eve.cmd_text(x + w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
+            if scale==1:eve.cmd_text(x + w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
+            else:eve.cmd_text(x + w/2, y + 3, 28, 0, "%3.1f"%( tvalue) )
 
     def barGraphHis(self,x,y,w,h,border,data=bytearray(),scale=1,blend=0):
         eve = self.eve

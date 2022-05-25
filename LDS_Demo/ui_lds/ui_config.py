@@ -9,8 +9,11 @@ class ui_config():
         self.debug=False
         #self.debug=True #  have debug button
         
-        self.btn_w = 75
-        self.btn_h = 30
+        self.btn_w = 110
+        self.btn_h = 35
+        self.x0 = 10
+        self.y0 = 10
 
         self.xmargin =10
         self.xStart = 380
+        self.timeout=100

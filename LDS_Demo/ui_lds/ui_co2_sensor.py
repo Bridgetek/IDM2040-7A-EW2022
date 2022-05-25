@@ -98,39 +98,15 @@ class ui_co2_sensor(ui_common):
     def drawBtn(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)
-
         y = self.layout.APP_Y 
         btn_w = self.btn_w
         btn_h = self.btn_h
-
-        xmargin =self.xmargin
         x1 = self.xStart
-
-        x2 = x1 + btn_w + xmargin
-        x3 = x2 + btn_w + xmargin
-        x4 = x3 + btn_w + xmargin
-        x5 = x4 + btn_w + xmargin
-
-        x2 = x1 + btn_w + xmargin
-        x3 = x2 + btn_w + xmargin
-        x4 = x3 + btn_w + xmargin
-        x5 = x4 + btn_w + xmargin
-        if ( self.debug):
-            eve.Tag(tag_ui_lds_home)
-            eve.cmd_button(x1, y, btn_w, btn_h, 30, 0, "Home")
-            eve.Tag(tag_ui_lds_reset_data)
-            eve.cmd_button(x2, y, btn_w, btn_h, 30, 0, "Reset")
-            eve.Tag(tag_ui_lds_data_text)
-            eve.cmd_button(x3, y, btn_w, btn_h, 30, 0, "Text")
-            eve.Tag(tag_ui_lds_data_gui)
-            eve.cmd_button(x4, y, btn_w, btn_h, 30, 0, "GUI")
-
+        x5 = x1 + 310
         eve.Tag(tag_ui_lds_back)
-        eve.cmd_button(x5, y, btn_w, btn_h, 30, 0, "Back")
-
-        #eve.Tag(0)
-        eve.TagMask(0) #The value zero means the tag buffer is set as the default value, rather than the value given by TAG command in the display list
-
+        eve.cmd_button(x5, y, btn_w, btn_h, 31, 0, "Back")
+        eve.Tag(0)
+        
     def event(self):
         eve = self.eve
         layout = self.layout
@@ -240,39 +216,22 @@ class ui_co2_sensor(ui_common):
         helper=self.helper
         eve.ColorRGB(0xff, 0xff, 0xff)
         
-        x = 10
-        y = 10
-        FONTSIZE = 18
-        btn_w = 60
-        btn_h = 30
-
-        #X=34 ,10 ,H=780,410,82
-        #print("X=%d ,%s ,H=%d,%d,%d  \n"%( self.layout.APP_X ,self.layout.APP_Y,  self.layout.APP_H,self.layout.APP_W, self.layout.MENU_W ) )
-
-        eve.cmd_text(x, y, 28, 0, self.title)
-
+        x = self.x0
+        y = self.y0
+        FONTSIZE = 29
+        eve.cmd_text(x, y, 31, 0, self.title)
         eve.Tag(tag_ui_lds_info)
-        eve.cmd_button(x+len(self.title)*FONTSIZE, y, btn_w, btn_h, 30, 0, "Info")
-
-        if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 30, 0, self.simulatorTitle)
-        
+        eve.cmd_button(x+len(self.title)*FONTSIZE, y, self.btn_w, self.btn_h, 31, 0, "Info")
+        if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)        
         self.drawBtn()
         self.event()
-
         ymargin = 50
         y +=  ymargin
-        widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])
-       
-        #eve.ColorRGB(0, 0, 0)       
-
-        eve.ColorRGB(255, 255, 255)
+        widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])      
         x+=50
         y+=20
-        #self.eve.SaveContext() 
-
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
         if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-        #self.eve.RestoreContext()
 
  
            
