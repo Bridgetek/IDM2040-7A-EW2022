@@ -7,14 +7,14 @@ import sys
 import time
 import gc
 
-from brteve.brt_eve_rp2040 import BrtEveRP2040
+from main_menu.brt_eve_rp2040_dmx import BrtEveRP2040_dmx as BrtEveRP2040
 
 if sys.implementation.name == "circuitpython":
     from brteve.brt_eve_bt817_8 import BrtEve
 else:
     from ....lib.brteve.brt_eve_bt817_8 import BrtEve
 
-# controler class
+
 class main_app():
 
     def __init__(self):
@@ -38,48 +38,32 @@ class main_app():
     def drawBtn(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)
-
         y =  90
         btn_w = 300
         btn_h = 60
-
         xmargin =100
         center = 200
         x1 = 50
         ymargin =40
-
         x2 = x1 + btn_w + xmargin
         x3 = x2 + btn_w + xmargin
         x4 = x3 + btn_w + xmargin
         x5 = x4 + btn_w + xmargin
-
         y2 = y + btn_h + ymargin
         y3 = y2 + btn_h + ymargin
         y4 = y3 + btn_h + ymargin
-
         eve.Tag(tag_cube_demo)
         eve.cmd_button(x1, y, btn_w, btn_h, 31, 0, "3D Cube Demo")
         eve.Tag(tag_blinka_dema)
         eve.cmd_button(x2, y, btn_w, btn_h, 31, 0, "Blinka Demo")
- 
-
         eve.Tag(tag_image_View)
         eve.cmd_button(x1, y2, btn_w, btn_h, 31, 0, "Image Viewer")
         eve.Tag(tag_dmx512_demo)
-        eve.cmd_button(x2, y2, btn_w, btn_h, 31, 0, "DMX512 Demo")
-        
+        eve.cmd_button(x2, y2, btn_w, btn_h, 31, 0, "DMX512 Demo")        
         eve.Tag(tag_audio_playback)
         eve.cmd_button(x1, y3, btn_w, btn_h, 31, 0, "Audio playback")
         eve.Tag(tag_video_playback)
         eve.cmd_button(x2, y3, btn_w, btn_h, 31, 0, "Video Playback")
-
-
-#         eve.Tag(tag_alarm_clock)
-#         eve.cmd_button(x1, y4, btn_w, btn_h, 31, 0, "Alarm clock")
-
-#         eve.Tag(tag_lds_demo)
-#         eve.cmd_button(x2, y4, btn_w, btn_h, 31, 0, "LDS Demo")
-
   
     def showException(self):
         self.eve.cmd_dlstart() #   
@@ -102,35 +86,16 @@ class main_app():
         if tag == tag_cube_demo:
                 print("tag_cube_demo")
                 from cube.cube import cube 
-                #del eve
-                #eve.deinit()
-                #eve.init(resolution="800x480", touch="capacity")
                 cube(eve).loop()
-
         elif tag == tag_blinka_dema:
                 print("tag_blinka_dema")
-                #del eve
-                #eve.init(resolution="800x480", touch="capacity")
                 from blinka.blinka_rotate import blinka_rotate  
                 blinka_rotate(eve).run()
-
         elif tag == tag_dmx512_demo:
-            #from IDM2040_demo.dmx512 import dmx512 as dmx512
             from  dmx512.dmx_ui import dmx_ui  
-            dmx_ui(eve).loop()
-            pass
-        
-#         elif tag == tag_alarm_clock:
-#             print("tag_alarm_clock")
-#             gc.collect()
-#             print("mem_free",gc.mem_free() )
-#             from alarm_clock.alarm_clock import alarm_clock 
-#             alarm_clock(eve)
-            
-            
+            dmx_ui(eve).loop()                  
         elif tag == tag_image_View:
             print("tag_image_View")
-            #from ir_sensors_and_gestures import ir_sensors_and_gestures
             from image_viewer.image_viewer import image_viewer  
             spi1 = eve.spi_sdcard()
             eve.finish()
@@ -153,40 +118,24 @@ class main_app():
              time.sleep(0.5)
 
     def loop(self):
-
         eve = self.eve
-        #layout = self.layout
-        #helper=self.helper
-        eve.cmd_dlstart() #   
-        eve.ClearColorRGB(0, 0, 0) #white
-
-        eve.Clear(1, 1, 1)
-        #self.eve.ClearColorA(0)
-
-         
+        eve.cmd_dlstart() 
+        eve.ClearColorRGB(0, 0, 0) 
+        eve.Clear(1, 1, 1)        
         x = 20; y = 10
         eve.cmd_text(x, y, 31, 0, "IDM2040 demo")
-
-
         self.drawBtn()
- 
-
         ev = self.get_event()
-
-
         try:
             eve.Display()
             eve.cmd_swap() 
             eve.flush() 
             eve.cmd_loadidentity() 
-
         except  Exception as e:
             print("exceprion:",e)
         self.processEvent(ev)
         eve.Tag(0)
         time.sleep(0.05)
-
-
 
 if __name__ == '__main__':
     mainMenu=main_app()
@@ -197,4 +146,3 @@ if __name__ == '__main__':
     except Exception as e:
         print("Other exception:",e)
         microcontroller.reset()
-
