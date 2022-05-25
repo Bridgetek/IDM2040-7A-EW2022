@@ -151,7 +151,7 @@ class audio_play():
                 self.stop()
                 while(self.audio_eve.is_playing()):
                     time.sleep(0.001)
-                self.play_pause()
+                self.play_pauseFromFlash()
             if self.loop == 2:
                 self.next_file()
         return  0
