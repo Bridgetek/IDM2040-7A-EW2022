@@ -211,6 +211,7 @@ class audio_play():
 
     def stop(self):
         if self.audio_eve.is_ready() != True:
+            self.loop = 0
             self.audio_eve.stop();
             self.ui.play(self.audio_eve.is_playing())
         else:
