@@ -35,7 +35,7 @@ class ui_relay(ui_config):
         self._maxLen=10
         self.hFanOn=5
         self.hFanOff=6
-        self.relayStatus={'Relay - CH 1':'1','Relay - CH 2':'0' ,'Current - CH 1':'0.000','Current - CH 2':'0.051'}
+        self.relayStatus={'Relay - CH 1':'1','Relay - CH 2':'0' ,'Current - CH 1':'0.000','Current - CH 2':'0.000'}
         self.last_timeout =  time.monotonic_ns() / 1000_000
  
     def interrupt(self):
@@ -98,9 +98,6 @@ class ui_relay(ui_config):
         img = self.layout.images[img_id]
         if formatW is None:
             formatW=self.eve.ASTC_4x4
-
-        #print('draw_img tag=', img,tag)
-
         self.helper.image_draw_from_ram_g(
             img[0], x, y, img[2], img[3], formatW, 0, tag, self.eve.OPT_DITHER)
 
@@ -155,17 +152,11 @@ class ui_relay(ui_config):
                                 elif vv=='1':
                                     self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOn",x2,y1) 
                                 eve.Tag(0)
-                            elif name=='Current - CH 1': 
+                            elif name=='Current - CH 1' and lds['OBJ']=='49152': 
                                 eve.cmd_text(x3,y2, 31, 0, "%s A"%vv)
-                            elif name=='Current - CH 2': 
+                            elif name=='Current - CH 2' and lds['OBJ']=='49152': 
                                 eve.cmd_text(x4,y2, 31, 0, "%s A"%vv)
-
-
-            if counter<4:
-                print ("Error when reading Relay Data:%d"%  ( counter) )
-
-  
-                         
+#            if counter<4:print ("Error when reading Relay Data:%d"%  ( counter) )                        
             if self.firstTime:  
                 self.firstTime=False
                    
