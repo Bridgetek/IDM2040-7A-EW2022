@@ -90,6 +90,9 @@ class audio_play():
             self.next_command = self.prev_file
         elif tag == tag_random: 
             self.set_random()
+        elif tag == tag_Back: 
+            print("FIFO back" )
+            self.stop()
 
         if ges.tagPressed == tag_volume: 
             self.set_volume()
@@ -126,6 +129,7 @@ class audio_play():
             self.set_random()
         elif tag == tag_Back: 
             print("back" )
+            self.stop()
             return -1 
         
         if ges.tagPressed == tag_volume: 
@@ -211,7 +215,6 @@ class audio_play():
 
     def stop(self):
         if self.audio_eve.is_ready() != True:
-            self.loop = 0
             self.audio_eve.stop();
             self.ui.play(self.audio_eve.is_playing())
         else:
