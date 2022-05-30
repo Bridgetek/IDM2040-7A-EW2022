@@ -78,15 +78,16 @@ class dmx_ui(object):
         eve.cmd_flashread(img[0], img[0]+4096, img[1])  
         eve.finish()
 
-        self.tWhitePercent=50
+        self.tWhitePercent=0
 
         self.radius=125
         self.sat=0.5
-        self.hue=90
+        self.hue=50
         self.lightness=128
-        self.rgb=(255,255,255)
+        #self.rgb=(128,128,128)
+        self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)
         self.x0=100
-        self.y0=50
+        self.y0=90
         self.hColorwheel=0
         self.message='please pick color'
         self.workMode='text'
@@ -163,75 +164,69 @@ class dmx_ui(object):
         return angleInDegree
 
     def updateRGB(self):
-            print("rgb:",self.sat,self.hue,self.rgb)
+            #print("rgb:",self.sat,self.hue,self.rgb)
             if self.sat>1:
                  print("invalid :",self.sat,self.hue,self.rgb)
                  return 
             self.message="sat:%5.3f,hue:%d,rgb:%x %x %x"%(self.sat,self.hue,self.rgb[0],self.rgb[1],self.rgb[2])
-            print(self.message)
+            #print(self.message)
             self.writeOneFrame(self.rgb,self.tWhitePercent)
     def writeOneFrame(self,rgb,tWhitePercent):
           self.dmx.setStart4ch(self.addrDMX,rgb[1], rgb[0], rgb[2] ,int(tWhitePercent*2.55))
           self.dmx.write_frame() # re-write  
     def processEvent(self,tag,touch):
-          if tag == tag_Back:
-              print("back")
-              return -1
-          elif tag == tag_lightness:
-             vv=touch.tagTrackTouched>>16
-             self.lightness=255*(vv/65535)
-             print("lightness",self.lightness)
-             self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)
-             self.updateRGB()
- 
-          elif tag == tag_colorpicker:
-            print("touch",touch.touchX,touch.touchY)
+        tagReleased=touch.tagReleased
+        # only send to DMX512 after released
+        if tagReleased==tag_lightness:
+            self.updateRGB()
+        elif tagReleased==tag_white:
+            self.writeOneFrame(self.rgb,self.tWhitePercent)
+        
+        if tag == tag_Back:
+            print("back")
+            return -1
+        elif tag == tag_lightness:
+         vv=touch.tagTrackTouched>>16
+         self.lightness=255*(vv/65535)
+         self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)
+        elif tag == tag_white:
+           vv=touch.tagTrackTouched>>16
+           self.tWhitePercent=100*(vv/65535)
+           self.rgb=(0,0,0)
+        elif tag == tag_colorpicker:
+            #print("touch",touch.touchX,touch.touchY)
             x0=self.x0+self.radius
             y0=self.y0+self.radius
-#             x1=touch.touchX-x0
-#             y1=touch.touchY-y0
             x1=touch.touchX
             y1=touch.touchY
             if x1==32768 or y1==32768:
                 print("invalid touch",x1,y1)
                 return 0
-            print("x0",x0,y0,x1,y1)
             self.sat=self.getSat(x0,y0,x1,y1,self.radius)
             self.hue=self.getHue(x0,y0,x1,y1)
-#             sat=self.getSat(x1,y1,x0,y0,self.radius)
-#             hue=self.getHue(x1,y1,x0,y0)
-            #rgb=self.hsv_to_rgb(hue,sat,self.lightness)
             self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)
-            #rgb=self.hsvToRgb(hue,sat,self.lightness)
+            self.tWhitePercent=0
             self.updateRGB()
- 
 
-          elif tag == tag_white:
-               vv=touch.tagTrackTouched>>16
-               self.tWhitePercent=100*(vv/65535)
-                 #print("tValue" ,tValue,tValue/65535,tPercent)
-               self.writeOneFrame(self.rgb,self.tWhitePercent)
+        elif tag == tag_all_red:
+            self.rgb=(255,0,0)
+            self.writeOneFrame(self.rgb,self.tWhitePercent)
 
-          elif tag == tag_all_red:
-               self.rgb=(255,0,0)
-               self.writeOneFrame(self.rgb,self.tWhitePercent)
+        elif tag == tag_all_green:
+            self.rgb=(0,255,0)
+            self.writeOneFrame(self.rgb,self.tWhitePercent)
 
-          elif tag == tag_all_green:
-               self.rgb=(0,255,0)
-               self.writeOneFrame(self.rgb,self.tWhitePercent)
+        elif tag == tag_all_blue:
+            self.rgb=(0,0,255)
+            self.writeOneFrame(self.rgb,self.tWhitePercent)
 
-          elif tag == tag_all_blue:
-               self.rgb=(0,0,255)
-               self.writeOneFrame(self.rgb,self.tWhitePercent)
-  
-          elif tag == tag_all_dark:
-               print("tag_all_dark")
-               self.rgb=(0,0,0)
-               self.tWhitePercent=0
-               self.writeOneFrame(self.rgb,self.tWhitePercent)
-  
+        elif tag == tag_all_dark:
+            print("tag_all_dark")
+            self.rgb=(0,0,0)
+            self.tWhitePercent=0
+            self.writeOneFrame(self.rgb,self.tWhitePercent)
 
-          return 0
+        return 0
 
  
     def loop(self):
@@ -247,7 +242,7 @@ class dmx_ui(object):
         while True:
             eve.cmd_dlstart() 
             eve.VertexFormat(2)
-            eve.ClearColorRGB(0, 0, 0)   # 255-> 1   ,new black color
+            eve.ClearColorRGB(0, 0, 0)    
             eve.Clear(1, 1, 1) 
             eve.ColorRGB(0xff, 0xff, 0xff)
             
@@ -262,14 +257,14 @@ class dmx_ui(object):
             w=300
             h=250
             
-            eve.Tag(tag_all_red)
-            eve.cmd_button(50, 400, 130,35,31, 0, "RED")
-            eve.Tag(tag_all_green)
-            eve.cmd_button(200, 400, 130,35,31, 0, "GREEN")
-            eve.Tag(tag_all_blue)
-            eve.cmd_button(350, 400, 130,35,31, 0, "BLUE")         
-            eve.Tag(tag_all_dark)
-            eve.cmd_button(500, 400, 130,35,31, 0, "DARK")
+#             eve.Tag(tag_all_red)
+#             eve.cmd_button(50, 400, 130,35,31, 0, "RED")
+#             eve.Tag(tag_all_green)
+#             eve.cmd_button(200, 400, 130,35,31, 0, "GREEN")
+#             eve.Tag(tag_all_blue)
+#             eve.cmd_button(350, 400, 130,35,31, 0, "BLUE")         
+#             eve.Tag(tag_all_dark)
+#             eve.cmd_button(500, 400, 130,35,31, 0, "DARK")
             
             eve.Tag(tag_colorpicker)                        
             img = self.images['circular_colorwheel']
@@ -289,7 +284,7 @@ class dmx_ui(object):
             
             h=15
             eve.cmd_fgcolor(0xffffff)
-            eve.cmd_bgcolor(0xffffff)  #white
+            eve.cmd_bgcolor(0xffffff)   
             eve.ColorRGB(0xff,0xff,0xff)
             eve.cmd_text(x+350, y, 28, 0, "White LED lightness" )
             eve.TagMask(1)
@@ -300,7 +295,7 @@ class dmx_ui(object):
             
             y= y+280
             eve.cmd_fgcolor(0xffffff)
-            eve.cmd_bgcolor(0xffffff)  #white
+            eve.cmd_bgcolor(0xffffff)  
             eve.ColorRGB(0xff,0xff,0xff)
             eve.Tag(tag_lightness)
             eve.cmd_track(x, y, w, h, tag_lightness)
@@ -312,7 +307,7 @@ class dmx_ui(object):
             eve.cmd_swap()   
             eve.flush() 
             if self.processEvent(touch.tagPressed,touch)<0: break      
-            time.sleep(0.01)
+            time.sleep(0.001)
             #if (t==1): break 
             t+=1
             #print(t)
