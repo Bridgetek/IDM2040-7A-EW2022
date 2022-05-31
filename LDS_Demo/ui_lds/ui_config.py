@@ -15,4 +15,4 @@ class ui_config():
 
         self.xmargin =10
         self.xStart = 380
-        self.timeout=100
+        self.readingInterval=1000 # reading sensor interval

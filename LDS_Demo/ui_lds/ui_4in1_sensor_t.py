@@ -54,53 +54,14 @@ class ui_4in1_sensor_t(ui_4in1_sensor):
             ui_4in1_sensor.data_gui=0
             print("tag_ui_lds_data_text")
   
-    def processOne(self,lds,x,y):
-            xHalf=410
-            yHalf=205
-            distance = 30
-            ldsuid = int(lds['DID'])
-            lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
-            """
-            Load and Parse the JSON File
-            """
-            with open(lds_object_file) as lds_json_file:
-                lds_json = json.load(lds_json_file)
-           
-                ss=""
-                for said, sensor in enumerate(lds_json['SNS']):
-                    sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
-                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
-                    if sns_value is not None:
-                        if len(ss) == 0:
-                            ss="%s:%-5.2f %s "% (sensor['NAME'][0:1],  float(sns_value['VALUE']), sensor['UNIT'][0:1])
-                        else: ss=ss+","+"%s:%5.2f %s "%(sensor['NAME'][0:1], float( sns_value['VALUE']), sensor['UNIT'][0:1])
-                        if  sensor['NAME'][0:1]=='T' and ui_4in1_sensor.data_gui==1:
-                            self.value_t=float( sns_value['VALUE'])
-                            self.push_temperature(self.value_t)
-
-                             
-                            if (self.useBlend==1): self.eve.SaveContext() 
-                            self.barGraphHis(x = x, y=y, w = 290, h = 180, border=1,data=ui_4in1_sensor.temperature_data,scale=2, blend=1) 
-                            #self.blendBk(x=x,y=y,w=290,h = 180, border=1,scale=2) 
-                            if (self.useBlend==1):
-                                self.blendBk(x=x,y=y,w=290,h = 180, border=1,scale=2  ,blend=1) 
-                                self.eve.RestoreContext()
-                            self.coordinateMarker(x,y,2*290,2*180,0,2,0 ,tvalue=self.value_t)
-                        if  sensor['NAME'][0:1]=='H' and ui_4in1_sensor.data_gui==1:
-                                self.value_h=float( sns_value['VALUE'])
-                                self.push_humidity(self.value_h)
-
-                         
-                if len(self._histroy ) >= self._maxLen:
-                    self._histroy = self._histroy [1:self._maxLen]
-                self._histroy .append(ss)
-
-                if ui_4in1_sensor.data_gui!=1:
-                    for item in self._histroy :
-                        self.eve.cmd_text(x+50, y, 28, 0, item)
-                        y+=distance
-                        #print("%s\n"%(item ) )
-                    #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
+    def processOne(self,lds,x,y):                      
+        if (self.useBlend==1): self.eve.SaveContext() 
+        self.barGraphHis(x = x, y=y, w = 290, h = 180, border=1,data=ui_4in1_sensor.temperature_data,scale=2, blend=1) 
+        if (self.useBlend==1):
+            self.blendBk(x=x,y=y,w=290,h = 180, border=1,scale=2  ,blend=1) 
+            self.eve.RestoreContext()
+        self.coordinateMarker(x,y,2*290,2*180,0,2,0 ,tvalue=self.value_t)
+                        
                  
     def draw(self):
         eve = self.eve
@@ -124,6 +85,9 @@ class ui_4in1_sensor_t(ui_4in1_sensor):
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
         if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-
+        ms = time.monotonic_ns() / 1000_000
+        if ms - self.last_timeout < self.readingInterval: return
+        self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.readOne(self.LDSBus_Sensor.lds)
  
            

@@ -61,10 +61,10 @@ class ui_main():
 
         self.hBk512=4
         self.useBlend=1
-
+        time.sleep(0.2)
         assetdir = "ui_lds/"
         eve.cmd_dlstart()  
-        bmAdd=1024*450
+        bmAdd=1024*750
         print("hBk512 bmAdd",bmAdd)
         eve.BitmapHandle(self.hBk512)
         eve.cmd_loadimage(bmAdd, 0)
@@ -73,7 +73,8 @@ class ui_main():
             self.eve.cmd_setrotate(2)
         else:
             self.eve.cmd_setrotate(0)
-        eve.cmd_swap()  
+        self.flush()
+        time.sleep(0.2)
         self.showScan()
         gc.collect()
         print("LDS ui_main mem_free",gc.mem_free() )
@@ -84,12 +85,8 @@ class ui_main():
     def start(self):
         self.eve.cmd_dlstart()
         self.eve.Clear(1, 1, 1)
-        self.eve.VertexFormat(3)
+        self.eve.VertexFormat(2)
 
-        if self.layout.portrait:
-            self.eve.cmd_setrotate(2)
-        else:
-            self.eve.cmd_setrotate(0)
 
     def flush(self):
         self.eve.Display()
@@ -129,15 +126,14 @@ class ui_main():
 
         tag = self.gesture.get().tagPressed
         tagReleased=self.gesture.get().tagReleased
-        if ( tag>0 ): print("main tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed,)
-        if ( tagReleased>0 ): print("main tagReleased", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
-        #if ( self.ui_active.tagReleased>0 ): print("ui_active tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed, self.ui_active.tagReleased)
+        #if ( tag>0 ): print("main tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed,)
+        #if ( tagReleased>0 ): print("main tagReleased", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
 
         if tagReleased==0: return
         tag=tagReleased
 
         self.ui_previous=self.ui_active.title
-        print("*ui_previous",self.ui_previous)  
+        #print("*ui_previous",self.ui_previous)  
 
         if tag == tag_ui_lds_scan:
             self.showScan()

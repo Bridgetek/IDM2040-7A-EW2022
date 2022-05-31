@@ -33,9 +33,7 @@ class ui_lds_scan(ui_config):
 
     def event(self):
         eve = self.eve
-        layout = self.layout
         ges = self.gesture
-
         tag = ges.get().tagReleased
         self.tagReleased=self.gesture.get().tagReleased
         if ( tag>0 ): print("lds_scan tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed ,self.tagReleased)
@@ -54,6 +52,7 @@ class ui_lds_scan(ui_config):
         x1 = self.xStart
         x5 = x1 + 310
         x4 = x1 + 210
+        #print("drawBtn",x5,y,btn_w,btn_h)
         if (self.exit==1):
             eve.Tag(tag_ui_back)
             eve.cmd_button(x4, y, btn_w, btn_h, 31, 0, "Back")
@@ -63,27 +62,23 @@ class ui_lds_scan(ui_config):
 
     def draw(self):
         eve = self.eve
-        layout = self.layout
-        helper=self.helper
         eve.ColorRGB(0xff, 0xff, 0xff)
         x = self.x0
         y = self.y0
         FONTSIZE = 16
         eve.cmd_text(x, y, 30, 0, self.title)
         if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)
+        
         self.drawBtn()
-        self.event()        
+        #self.event()        
         eve.Tag(0)  
         ymargin = 70
         y +=  ymargin       
         distance = 50
         eve.ColorRGB(255, 255, 255)
-
         if self._rescan :
             self._rescan =False
             self.LDSBus_Sensor.scanLDS()
-
-        eve.ColorRGB(85, 85, 127)
         eve.ColorRGB(170, 85, 0)
         eve.cmd_text(x, y, 29, 0, "LDS Name")
         eve.cmd_text(x+310, y, 29, 0, "DID")

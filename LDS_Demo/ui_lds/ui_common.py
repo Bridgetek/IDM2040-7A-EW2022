@@ -43,20 +43,16 @@ class ui_common(ui_config):
         self.temp_value=0        
         self.hr_value=0
         self.last_hr=0
-
-
         self.useGradient=0
-
         self._COLOR_GREEN=[0x90, 0xC8, 0x3A]
         self._COLOR_GRAY=[0x33, 0x33, 0x33]
         self._COLOR_WARNING=[0xD4, 0x21, 0x33]
         self._COLOR_YELLOW=[0xFF, 0xFF, 0x00]
-
         self.hData=2
         self.hBk=3
         self.hBk512=4
-
         self.useBlend=1
+        self.last_timeout =  time.monotonic_ns() / 1000_000
 
  
     def interrupt(self):
@@ -596,6 +592,26 @@ class ui_common(ui_config):
             eve.ColorRGB(self._COLOR_GREEN[0],self._COLOR_GREEN[1],self._COLOR_GREEN[2])
             if scale==1:eve.cmd_text(x + w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
             else:eve.cmd_text(x + w/2, y + 3, 28, 0, "%3.1f"%( tvalue) )
+
+    def boxMotion(self,x,y,w,h,border,scale=1,blend=0,tvalue=0):
+        eve = self.eve
+        if border==1:
+            m=20
+            eve.ColorRGB(255, 255, 255)
+            eve.Begin(eve.LINES)
+            eve.LineWidth(1)
+            eve.Vertex2f(x , y )
+            eve.Vertex2f(x+w+m, y )
+            eve.Vertex2f(x+w+m , y )
+            eve.Vertex2f(x+w+m , y+h )
+            eve.Vertex2f(x+w+m , y+h )
+            eve.Vertex2f(x , y+h )
+            eve.Vertex2f(x , y+h )
+            eve.Vertex2f(x , y  )    
+        eve.ColorRGB(255, 255, 255)
+        if scale==1:eve.cmd_text(x + 3, y + 3, 21, 0, "Motion")
+        else:eve.cmd_text(x + 3, y + 3, 28, 0, "Motion")
+
 
     def barGraphHis(self,x,y,w,h,border,data=bytearray(),scale=1,blend=0):
         eve = self.eve

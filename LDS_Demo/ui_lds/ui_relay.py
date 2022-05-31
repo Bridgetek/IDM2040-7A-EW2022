@@ -111,60 +111,64 @@ class ui_relay(ui_config):
             x3=x+150
             x4=x+550
             ldsuid = int(lds['DID'])
-            counter=0
-            if self.firstTime:  
-                #self.firstTime=False;
-                print("ldsuid:",ldsuid, "OBJ:",lds['OBJ'] ," lds:",lds)
-            self.ldsuid=ldsuid
-            lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
-            """
-            Load and Parse the JSON File
-            """
-            with open(lds_object_file) as lds_json_file:
-                lds_json = json.load(lds_json_file)
-                self.lds_json=lds_json
-                ss=""
-                for said, sensor in enumerate(lds_json['SNS']):
-                    time.sleep(0.01)
-                    if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
-                        sns_value = self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
-                        #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
-                        if self.firstTime:print ("DID=%d %20s :type:%s %s "%  (ldsuid,sensor['NAME'],  sensor['TYPE'],sns_value) )
-                        if sns_value is not None:
-                            vv=sns_value['VALUE']
-                            if self.relayStatus[sensor['NAME']] != vv:
-                                self.relayStatus[sensor['NAME']]=vv
-                                print("%s changed  %s" % (sensor['NAME'],self.relayStatus[sensor['NAME']] ))
-                            counter+=1
+            counter=0  
             for name in self.relayStatus:
-                            vv=self.relayStatus[name]
-                            if name=='Relay - CH 1':
-                                eve.Tag(tag_ui_lds_relay_ch1)
-                                if vv=='0':
-                                    self.layout.draw_asset4(tag_ui_lds_relay_ch1,"fanOff",x1,y1) 
-                                elif vv=='1':
-                                    self.layout.draw_asset4(tag_ui_lds_relay_ch1,"fanOn",x1,y1)   
-                                eve.Tag(0)
-                            elif name=='Relay - CH 2': 
-                                eve.Tag(tag_ui_lds_relay_ch2)
-                                if vv=='0':
-                                    self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOff",x2,y1) 
-                                elif vv=='1':
-                                    self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOn",x2,y1) 
-                                eve.Tag(0)
-                            elif name=='Current - CH 1' and lds['OBJ']=='49152': 
-                                eve.cmd_text(x3,y2, 31, 0, "%s A"%vv)
-                            elif name=='Current - CH 2' and lds['OBJ']=='49152': 
-                                eve.cmd_text(x4,y2, 31, 0, "%s A"%vv)
+                vv=self.relayStatus[name]
+                if name=='Relay - CH 1':
+                    eve.Tag(tag_ui_lds_relay_ch1)
+                    if vv=='0':
+                        self.layout.draw_asset4(tag_ui_lds_relay_ch1,"fanOff",x1,y1) 
+                    elif vv=='1':
+                        self.layout.draw_asset4(tag_ui_lds_relay_ch1,"fanOn",x1,y1)   
+                    eve.Tag(0)
+                elif name=='Relay - CH 2': 
+                    eve.Tag(tag_ui_lds_relay_ch2)
+                    if vv=='0':
+                        self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOff",x2,y1) 
+                    elif vv=='1':
+                        self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOn",x2,y1) 
+                    eve.Tag(0)
+                elif name=='Current - CH 1' and lds['OBJ']=='49152': 
+                    eve.cmd_text(x3,y2, 31, 0, "%s A"%vv)
+                elif name=='Current - CH 2' and lds['OBJ']=='49152': 
+                    eve.cmd_text(x4,y2, 31, 0, "%s A"%vv)                     
+
+                
+    def readOne(self,lds):
+        eve = self.eve
+        ldsuid = int(lds['DID'])
+        counter=0
+        if self.firstTime:  
+            #self.firstTime=False;
+            print("ldsuid:",ldsuid, "OBJ:",lds['OBJ'] ," lds:",lds)
+        self.ldsuid=ldsuid
+        lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
+        """
+        Load and Parse the JSON File
+        """
+        with open(lds_object_file) as lds_json_file:
+            lds_json = json.load(lds_json_file)
+            self.lds_json=lds_json
+            ss=""
+            for said, sensor in enumerate(lds_json['SNS']):
+                time.sleep(0.01)
+                if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
+                    sns_value = self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
+                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
+                    if self.firstTime:print ("DID=%d %20s :type:%s %s "%  (ldsuid,sensor['NAME'],  sensor['TYPE'],sns_value) )
+                    if sns_value is not None:
+                        vv=sns_value['VALUE']
+                        if self.relayStatus[sensor['NAME']] != vv:
+                            self.relayStatus[sensor['NAME']]=vv
+                            print("%s changed  %s" % (sensor['NAME'],self.relayStatus[sensor['NAME']] ))
+                        counter+=1
 #            if counter<4:print ("Error when reading Relay Data:%d"%  ( counter) )                        
-            if self.firstTime:  
-                self.firstTime=False
+        if self.firstTime:  
+            self.firstTime=False
                    
     def draw(self):
         eve = self.eve
-        ms = time.monotonic_ns() / 1000_000
-        if ms - self.last_timeout < self.timeout: return
-        self.last_timeout =  time.monotonic_ns() / 1000_000
+
         layout = self.layout
         helper=self.helper
         eve.ColorRGB(0xff, 0xff, 0xff)       
@@ -184,4 +188,8 @@ class ui_relay(ui_config):
         y +=  ymargin
         eve.cmd_text(x+100, y, 31, 0, "Channel 1")
         eve.cmd_text(x+500, y, 31, 0, "Channel 2")
-        self.processOne(self.LDSBus_Sensor.lds,x,y)
+        self.processOne(self.LDSBus_Sensor.lds,x,y) 
+        ms = time.monotonic_ns() / 1000_000
+        if ms - self.last_timeout < self.readingInterval: return
+        self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.readOne(self.LDSBus_Sensor.lds)

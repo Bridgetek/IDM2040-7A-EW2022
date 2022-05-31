@@ -51,51 +51,7 @@ class ui_co2_sensor_co2(ui_co2_sensor):
         
 
     def processOne(self,lds,x,y):
-            xHalf=410
-            yHalf=205
-            distance = 30
-            ldsuid = int(lds['DID'])
-            lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
-            """
-            Load and Parse the JSON File
-            """
-            with open(lds_object_file) as lds_json_file:
-                lds_json = json.load(lds_json_file)
-           
-                if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
-                    ss=""
-                    for said, sensor in enumerate(lds_json['SNS']):
-                        sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
-                        #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
-                        if sns_value is not None:
-                            if len(ss) == 0:
-                                ss="%s:%-5.2f %s "% (sensor['NAME'][0:1],  float(sns_value['VALUE']), sensor['UNIT'][0:1])
-                            else: ss=ss+","+"%s:%5.2f %s "%(sensor['NAME'][0:1], float( sns_value['VALUE']), sensor['UNIT'][0:1])
-
-                            if  sensor['NAME']=='CO2' and ui_co2_sensor.data_gui==1:
-                                co2=float( sns_value['VALUE'])
-                                if (co2!=0 ) and (co2!=self.value_co2):
-                                    self.value_co2=co2
-
-                                
-                            
-                    if len(self._histroy ) >= self._maxLen:
-                        self._histroy = self._histroy [1:self._maxLen]
-                    self._histroy .append(ss)
-
-                    if ui_co2_sensor.data_gui!=1:
-                        for item in self._histroy :
-                            self.eve.cmd_text(x+50, y, 28, 0, item)
-                            y+=distance
-                            #print("%s\n"%(item ) )
-                        #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
-
-                else:
-                        print ("%20s : %s ,ldsuid=%d" %  ("CO2 SENSOR PROCESS(H)", "FAILED" ,ldsuid))
-                if ui_co2_sensor.data_gui==1:
-                    self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="CO2",unit="ppm", vmin=0, vmax=2000, lwarning=20, hwarning=1600, value=self.value_co2,tsize=31,scale=2)
-
-                 
+        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="CO2",unit="ppm", vmin=0, vmax=5000, lwarning=100, hwarning=4000, value=self.value_co2,tsize=31,scale=2)               
                  
     def draw(self):
         eve = self.eve
@@ -117,5 +73,8 @@ class ui_co2_sensor_co2(ui_co2_sensor):
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
         if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
- 
+        ms = time.monotonic_ns() / 1000_000
+        if ms - self.last_timeout < self.readingInterval: return
+        self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.readOne(self.LDSBus_Sensor.lds) 
            

@@ -97,10 +97,10 @@
         },
         {
             "NAME": "Ambient Light",
-            "MFI": "BH1730",
-            "PART": "BH1730",
+            "MFI": "LITE-ON Technology Corp.",
+            "PART": "LTR-303ALS-01",
             "REGSIZE": "1",
-            "ADDRESS": "29",
+            "ADDRESS": "41",
             "BOMID": "1234",
             "CLS": "1024",
             "VSPEC": "1234",

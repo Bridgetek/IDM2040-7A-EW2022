@@ -126,89 +126,77 @@ class ui_co2_sensor(ui_common):
         elif tag == tag_ui_lds_data_text:     
             ui_co2_sensor.data_gui=0
             print("tag_ui_lds_data_text")
-        
-
     def processOne(self,lds,x,y):
-            xHalf=410
-            yHalf=205
-            width=290
-            distance = 30
-            ldsuid = int(lds['DID'])
-            lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
-            """
-            Load and Parse the JSON File
-            """
-            with open(lds_object_file) as lds_json_file:
-                lds_json = json.load(lds_json_file)
-           
-                if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
-                    ss=""
-                    for said, sensor in enumerate(lds_json['SNS']):
-                        sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
-                        #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
-                        if sns_value is not None:
-                            if len(ss) == 0:
-                                ss="%s:%-5.2f %s "% (sensor['NAME'][0:1],  float(sns_value['VALUE']), sensor['UNIT'][0:1])
-                            else: ss=ss+","+"%s:%5.2f %s "%(sensor['NAME'][0:1], float( sns_value['VALUE']), sensor['UNIT'][0:1])
-                            if  sensor['NAME'][0:1]=='T' and ui_co2_sensor.data_gui==1:
-                                self.value_t=float( sns_value['VALUE'])
-                                self.push_temperature(self.value_t)                                
-                            if  sensor['NAME'][0:1]=='A' and ui_co2_sensor.data_gui==1:
-                                self.value_a=float( sns_value['VALUE'])
-                            if  sensor['NAME'][0:1]=='H' and ui_co2_sensor.data_gui==1:
-                                #print("Humdity", sns_value['VALUE'])
-                                self.value_h=float( sns_value['VALUE'])
-                                self.push_humidity(self.value_h)                               
-                            if  sensor['NAME']=='CO2' and ui_co2_sensor.data_gui==1: #Motion
-                                co2=float( sns_value['VALUE'])
-                                if (co2!=0 ) and (co2!=self.value_co2):
-                                    self.value_co2=co2
-                                #print("CO2", sns_value['VALUE'])
-                               
-
-    
-                            #pass
-
-                    if len(self._histroy ) >= self._maxLen:
-                        self._histroy = self._histroy [1:self._maxLen]
-                    self._histroy .append(ss)
-
-                    if ui_co2_sensor.data_gui!=1:
-                        for item in self._histroy :
-                            self.eve.cmd_text(x+50, y, 28, 0, item)
-                            y+=distance
-                            #print("%s\n"%(item ) )
-                    #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
-                else:
-                    print ("%20s : %s ,ldsuid=%d" %  ("CO2 SENSOR PROCESS", "FAILED" ,ldsuid))
-                
-                if ui_co2_sensor.data_gui==1:
-
-                    self.eve.TagMask(1)
-                    self.eve.Tag(tag_ui_lds_co2_t)
- 
-                    if (self.useBlend==1): self.eve.SaveContext() 
-                    self.barGraphHis(x = x, y=y, w = width, h = 180, border=1,  data=ui_co2_sensor.temperature_data,scale=1,blend=1)
-                    if (self.useBlend==1):
-                        self.blendBk(x=x,y=y,w=width,h = 180, border=1 ,blend=1) 
-                        self.eve.RestoreContext()
-                    self.coordinateMarker(x,y,width,180,1,1,0,tvalue=self.value_t)
+        xHalf=410
+        yHalf=205
+        width=290
+        distance = 30         
+        if ui_co2_sensor.data_gui==1:
+            self.eve.TagMask(1)
+            self.eve.Tag(tag_ui_lds_co2_t)
+            if (self.useBlend==1): self.eve.SaveContext() 
+            self.barGraphHis(x = x, y=y, w = width, h = 180, border=1,  data=ui_co2_sensor.temperature_data,scale=1,blend=1)
+            if (self.useBlend==1):
+                self.blendBk(x=x,y=y,w=width,h = 180, border=1 ,blend=1) 
+                self.eve.RestoreContext()
+            self.coordinateMarker(x,y,width,180,1,1,0,tvalue=self.value_t)
+            self.eve.Tag(tag_ui_lds_co2_a)
+            if (self.useBlend==1): self.eve.SaveContext() 
+            self.circle_box(x =x+xHalf, y=y, w = width, h = 180, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a)
+            if (self.useBlend==1):self.eve.RestoreContext()
+            self.eve.Tag(tag_ui_lds_co2_h)
+            if (self.useBlend==1): self.eve.SaveContext() 
+            self.statitics_box(x = x+xHalf, y=y+yHalf, w = width, h = 180, border=1,data=ui_co2_sensor.humidity_data ,tvalue=self.value_h)
+            if (self.useBlend==1):self.eve.RestoreContext()
+            self.eve.Tag(tag_ui_lds_co2_co2)
+            self.circle_box(x =x, y=y+yHalf, w = width, h = 180, border=1, title="CO2",unit="ppm", vmin=0, vmax=5000, lwarning=100, hwarning=4000, value=self.value_co2)
 
 
-                    self.eve.Tag(tag_ui_lds_co2_a)
-                    if (self.useBlend==1): self.eve.SaveContext() 
-                    self.circle_box(x =x+xHalf, y=y, w = width, h = 180, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a)
-                    if (self.useBlend==1):self.eve.RestoreContext()
+    def readOne(self,lds):
+        ldsuid = int(lds['DID'])
+        lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
+        """
+        Load and Parse the JSON File
+        """
+        with open(lds_object_file) as lds_json_file:
+            lds_json = json.load(lds_json_file)
+       
+            if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
+                ss=""
+                for said, sensor in enumerate(lds_json['SNS']):
+                    sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
+                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
+                    if sns_value is not None:
+                        if len(ss) == 0:
+                            ss="%s:%-5.2f %s "% (sensor['NAME'][0:1],  float(sns_value['VALUE']), sensor['UNIT'][0:1])
+                        else: ss=ss+","+"%s:%5.2f %s "%(sensor['NAME'][0:1], float( sns_value['VALUE']), sensor['UNIT'][0:1])
+                        if  sensor['NAME'][0:1]=='T' and ui_co2_sensor.data_gui==1:
+                            self.value_t=float( sns_value['VALUE'])
+                            self.push_temperature(self.value_t)                                
+                        if  sensor['NAME'][0:1]=='A' and ui_co2_sensor.data_gui==1:
+                            self.value_a=float( sns_value['VALUE'])
+                        if  sensor['NAME'][0:1]=='H' and ui_co2_sensor.data_gui==1:
+                            #print("Humdity", sns_value['VALUE'])
+                            self.value_h=float( sns_value['VALUE'])
+                            self.push_humidity(self.value_h)                               
+                        if  sensor['NAME']=='CO2' and ui_co2_sensor.data_gui==1: #Motion
+                            co2=float( sns_value['VALUE'])
+                            if (co2!=0 ) and (co2!=self.value_co2):
+                                self.value_co2=co2
+                            #print("CO2", sns_value['VALUE'])                          
+                if len(self._histroy ) >= self._maxLen:
+                    self._histroy = self._histroy [1:self._maxLen]
+                self._histroy .append(ss)
 
-
-                    self.eve.Tag(tag_ui_lds_co2_h)
-                    if (self.useBlend==1): self.eve.SaveContext() 
-                    self.statitics_box(x = x+xHalf, y=y+yHalf, w = width, h = 180, border=1,data=ui_co2_sensor.humidity_data ,tvalue=self.value_h)
-                    if (self.useBlend==1):self.eve.RestoreContext()
-
-
-                    self.eve.Tag(tag_ui_lds_co2_co2)
-                    self.circle_box(x =x, y=y+yHalf, w = width, h = 180, border=1, title="CO2",unit="ppm", vmin=0, vmax=2000, lwarning=20, hwarning=1600, value=self.value_co2)
+                if ui_co2_sensor.data_gui!=1:
+                    for item in self._histroy :
+                        self.eve.cmd_text(x+50, y, 28, 0, item)
+                        y+=distance
+                        #print("%s\n"%(item ) )
+                #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
+            else:
+                pass
+                #print ("%20s : %s ,ldsuid=%d" %  ("CO2 SENSOR PROCESS", "FAILED" ,ldsuid))
 
     def draw(self):
         eve = self.eve
@@ -232,6 +220,7 @@ class ui_co2_sensor(ui_common):
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
         if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-
- 
-           
+        ms = time.monotonic_ns() / 1000_000
+        if ms - self.last_timeout < self.readingInterval: return
+        self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.readOne(self.LDSBus_Sensor.lds)

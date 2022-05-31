@@ -37,7 +37,7 @@ class LDSBus_Sensor(ui_config):
         self.turnOnLDS()
 
     def turnOnLDS(self):
-        #print(ui_common.__dict__)
+        print("turnOnLDS")
         #print(LDSBus_Sensor.__dict__)
         if self.skipSensor: return
         """
@@ -83,7 +83,7 @@ class LDSBus_Sensor(ui_config):
                              #10: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus 2CH Relay', 'MFG': '19012022', 'DID': '10', 'NICK': 'LDSBus 2CH Relay', 'UID': 'LC01110101042200001', 'SNO': 'A6599D5F', 'OBJ': '16385'}, 
                              99: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus 2CH Relay + iSENSE', 'MFG': '28042022', 'DID': '99', 'NICK': 'LDSBus 2CH Relay + iSENSE', 'UID': 'LC01010128042200004', 'SNO': '638EF554', 'OBJ': '49152'}, 
  #                            3: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus Thermocouple Sensor', 'MFG': '23062021', 'DID': '3', 'NICK': 'LDSBus Thermocouple Sensor', 'UID': 'LS01010105232113104', 'SNO': '000003EB', 'OBJ': '32769'},
-                             16: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus CO2 Sensor SCD4x', 'MFG': '11032022', 'DID': '16', 'NICK': 'LDSBus CO2 Sensor SCD4x', 'UID': 'LS01010133112213873', 'SNO': '000003F8', 'OBJ': '64513'}}
+                             16: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus CO2 Sensor SCD4x', 'MFG': '11032022', 'DID': '16', 'NICK': 'LDSBus CO2 Sensor SCD4x', 'UID': 'LS01010133112213873', 'SNO': '000003F8', 'OBJ': '32785'}}
                             return
         print ("Scan start:%d\n" %  (startTime))
         self._lds_count = self.lds_bus.LDSBus_SDK_Scan()
