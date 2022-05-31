@@ -149,7 +149,7 @@ class ui_co2_sensor(ui_common):
             self.statitics_box(x = x+xHalf, y=y+yHalf, w = width, h = 180, border=1,data=ui_co2_sensor.humidity_data ,tvalue=self.value_h)
             if (self.useBlend==1):self.eve.RestoreContext()
             self.eve.Tag(tag_ui_lds_co2_co2)
-            self.circle_box(x =x, y=y+yHalf, w = width, h = 180, border=1, title="CO2",unit="ppm", vmin=0, vmax=5000, lwarning=100, hwarning=4000, value=self.value_co2)
+            self.circle_box(x =x, y=y+yHalf, w = width, h = 180, border=1, title="CO2",unit="ppm", vmin=0, vmax=30000, lwarning=100, hwarning=25000, value=self.value_co2)
 
 
     def readOne(self,lds):
@@ -194,9 +194,10 @@ class ui_co2_sensor(ui_common):
                         y+=distance
                         #print("%s\n"%(item ) )
                 #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
+                return 1
             else:
-                pass
-                #print ("%20s : %s ,ldsuid=%d" %  ("CO2 SENSOR PROCESS", "FAILED" ,ldsuid))
+                #print ("%20s : %s ,ldsuid=%d" %  ("CO2 SENSOR PROCESS", "FAILED" ,ldsuid),   time.time())
+                return -1
 
     def draw(self):
         eve = self.eve
@@ -222,5 +223,6 @@ class ui_co2_sensor(ui_common):
         if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
         ms = time.monotonic_ns() / 1000_000
         if ms - self.last_timeout < self.readingInterval: return
-        self.last_timeout =  time.monotonic_ns() / 1000_000
-        self.readOne(self.LDSBus_Sensor.lds)
+        if self.readOne(self.LDSBus_Sensor.lds)>0:
+            self.last_timeout =  time.monotonic_ns() / 1000_000
+            

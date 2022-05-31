@@ -41,13 +41,38 @@ class layout():
         img = self.images['fanOn']
         eve.cmd_flashread(img[0], img[0]+4096, img[1])  
         img = self.images['fanOff']
-        eve.cmd_flashread(img[0], img[0]+4096, img[1])  
+        eve.cmd_flashread(img[0], img[0]+4096, img[1])
+        self.imagesMCU = {
+            # id                 location                                                         ramg address  width  height
+            'm_active':['ui_lds/motion_sensor_active_COMPRESSED_RGBA_ASTC_4x4_KHR.raw',0,192,168],
+            'm_inactive':['ui_lds/motion_sensor_inactive_COMPRESSED_RGBA_ASTC_4x4_KHR.raw',0,192,168],
+            #'m_active':['ui_lds/motionSensor_active_s_188x188_COMPRESSED_RGBA_ASTC_4x4_KHR.raw',0,188,188],
+            #'m_inactive':['ui_lds/motionSensor_inactive_s_188x188_COMPRESSED_RGBA_ASTC_4x4_KHR.raw',0,188,188],
+        }
+
+        address = 512*1024
+        for index in self.imagesMCU:
+            address = self.round_to_nearest(address, 4)
+            self.imagesMCU[index][1] = address
+            #print(address,self.imagesMCU[index])
+            address = self.eve.write_file(address, self.imagesMCU[index][0])
+
+
         eve.finish()
 
 
     def round_to_nearest(self, n, m):
         return (n + m - 1) // m * m
 
+
+    def draw_asset_MCU(self, tag, index, x, y, fm,scale=1):
+        helper = self.helper
+        self.helper.image_setup_scale(scale)
+        helper.image_draw_from_ram_g(self.imagesMCU[index][1],
+            x, y,
+            self.imagesMCU[index][2], self.imagesMCU[index][3],
+            fm, 0, tag, self.eve.OPT_DITHER)
+        
     def draw_asset4(self, tag, index, x, y):
         helper = self.helper
         helper.image_draw_from_ram_g(self.images[index][0],

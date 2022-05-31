@@ -48,46 +48,15 @@ class ui_4in1_sensor_m(ui_4in1_sensor):
             print("tag_ui_lds_data_gui")
         elif tag == tag_ui_lds_data_text:     
             ui_4in1_sensor.data_gui=0
-            print("tag_ui_lds_data_text")
-        
+            print("tag_ui_lds_data_text")       
 
     def processOne(self,lds,x,y):
-            xHalf=410
-            yHalf=205
-            distance = 30
-            ldsuid = int(lds['DID'])
-            lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
-            """
-            Load and Parse the JSON File
-            """
-            with open(lds_object_file) as lds_json_file:
-                lds_json = json.load(lds_json_file)
-           
-                ss=""
-                for said, sensor in enumerate(lds_json['SNS']):
-                    sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
-                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
-                    if sns_value is not None:
-                        if len(ss) == 0:
-                            ss="%s:%-5.2f %s "% (sensor['NAME'][0:1],  float(sns_value['VALUE']), sensor['UNIT'][0:1])
-                        else: ss=ss+","+"%s:%5.2f %s "%(sensor['NAME'][0:1], float( sns_value['VALUE']), sensor['UNIT'][0:1])
-
-                        if  sensor['NAME'][0:1]=='M' and ui_4in1_sensor.data_gui==1:
-                            self.Progress_box(x =x, y=y ,w = 290*2, h = 180*2, border=1, title="Motion",unit=" ", vmin=0, vmax=1, warning=1, value=float( sns_value['VALUE']),scale=2)
-                            #self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="Motion",unit="m", vmin=0, vmax=1, lwarning=1, hwarning=1, value=float( sns_value['VALUE']))
- 
-                         
-                if len(self._histroy ) >= self._maxLen:
-                    self._histroy = self._histroy [1:self._maxLen]
-                self._histroy .append(ss)
-
-                if ui_4in1_sensor.data_gui!=1:
-                    for item in self._histroy :
-                        self.eve.cmd_text(x+50, y, 28, 0, item)
-                        y+=distance
-                        #print("%s\n"%(item ) )
-                    #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
-                 
+#         self.Progress_box(x =x, y=y ,w = 290*2, h = 180*2, border=1, title="Motion",unit=" ", vmin=0, vmax=1, warning=1, value=self.value_m,scale=2)
+        if self.value_m>=1:
+            self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_active",x =x+120, y=y+10,fm=self.eve.ASTC_4x4,scale=2)
+        else:
+            self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_inactive",x =x+120, y=y+10,fm=self.eve.ASTC_4x4,scale=2)
+  
     def draw(self):
         eve = self.eve
         layout = self.layout
@@ -108,7 +77,8 @@ class ui_4in1_sensor_m(ui_4in1_sensor):
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
         if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-
-
- 
-           
+        ms = time.monotonic_ns() / 1000_000
+        if ms - self.last_timeout < self.readingInterval: return
+        self.last_timeout =  time.monotonic_ns() / 1000_000
+        if self.readOne(self.LDSBus_Sensor.lds)>0:
+            self.last_timeout =  time.monotonic_ns() / 1000_000

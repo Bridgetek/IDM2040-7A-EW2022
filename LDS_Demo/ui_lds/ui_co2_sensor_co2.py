@@ -51,7 +51,7 @@ class ui_co2_sensor_co2(ui_co2_sensor):
         
 
     def processOne(self,lds,x,y):
-        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="CO2",unit="ppm", vmin=0, vmax=5000, lwarning=100, hwarning=4000, value=self.value_co2,tsize=31,scale=2)               
+        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="CO2",unit="ppm", vmin=0, vmax=30000, lwarning=100, hwarning=25000, value=self.value_co2,tsize=31,scale=2)               
                  
     def draw(self):
         eve = self.eve
@@ -76,5 +76,6 @@ class ui_co2_sensor_co2(ui_co2_sensor):
         ms = time.monotonic_ns() / 1000_000
         if ms - self.last_timeout < self.readingInterval: return
         self.last_timeout =  time.monotonic_ns() / 1000_000
-        self.readOne(self.LDSBus_Sensor.lds) 
+        if self.readOne(self.LDSBus_Sensor.lds)>0:
+            self.last_timeout =  time.monotonic_ns() / 1000_000
            

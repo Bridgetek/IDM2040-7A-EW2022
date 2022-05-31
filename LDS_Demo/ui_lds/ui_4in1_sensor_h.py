@@ -78,7 +78,7 @@ class ui_4in1_sensor_h(ui_4in1_sensor):
         ms = time.monotonic_ns() / 1000_000
         if ms - self.last_timeout < self.readingInterval: return
         self.last_timeout =  time.monotonic_ns() / 1000_000
-        self.readOne(self.LDSBus_Sensor.lds)
-
+        if self.readOne(self.LDSBus_Sensor.lds)>0:
+            self.last_timeout =  time.monotonic_ns() / 1000_000
  
            

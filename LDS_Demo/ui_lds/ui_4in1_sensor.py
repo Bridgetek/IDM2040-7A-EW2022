@@ -37,7 +37,8 @@ class ui_4in1_sensor(ui_common):
         self.title="LDS 4In1 Sensor"
         self.value_t=0 
         self.value_h=0     
-        self.value_a=0  
+        self.value_a=0
+        self.value_m=0
 
     last_push_humidity = 0
     def push_humidity(self, value):
@@ -129,74 +130,74 @@ class ui_4in1_sensor(ui_common):
 
 
     def processOne(self,lds,eve,x,y):
-            xHalf=410
-            yHalf=205
-            distance = 30
-            ldsuid = int(lds['DID'])
-            lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
-            """
-            Load and Parse the JSON File
-            """
-            with open(lds_object_file) as lds_json_file:
-                lds_json = json.load(lds_json_file)
-                if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
-                    ss=""
-                    for said, sensor in enumerate(lds_json['SNS']):
-                        sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
-                        #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
-                        if sns_value is not None:
-                            if len(ss) == 0:
-                                ss="%s:%-5.2f %s "% (sensor['NAME'][0:1],  float(sns_value['VALUE']), sensor['UNIT'][0:1])
-                            else: ss=ss+","+"%s:%5.2f %s "%(sensor['NAME'][0:1], float( sns_value['VALUE']), sensor['UNIT'][0:1])
-                            if  sensor['NAME'][0:1]=='T' and ui_4in1_sensor.data_gui==1:
-                                self.value_t=float( sns_value['VALUE'])
-                                self.push_temperature(self.value_t)
-                                eve.TagMask(1)
-                                eve.Tag(tag_ui_lds_4in1_t)
-    
-                                if (self.useBlend==1): eve.SaveContext() 
-                                self.barGraphHis(x = x, y=y, w = 290, h = 180, border=1,  data=ui_4in1_sensor.temperature_data ,scale=1,blend=1)
-                                if (self.useBlend==1):
-                                    self.blendBk(x=x,y=y,w=290,h = 180, border=1 ,scale=1,blend=1) 
-                                    eve.RestoreContext()
-                                self.coordinateMarker(x,y,290,180,1,1,0,tvalue=self.value_t) 
-                            if  sensor['NAME'][0:1]=='A' and ui_4in1_sensor.data_gui==1:
-                                self.eve.TagMask(1)
-                                self.eve.Tag(tag_ui_lds_4in1_a)
+        xHalf=410
+        yHalf=205
+        distance = 30
+        ldsuid = int(lds['DID'])      
+        eve.TagMask(1)
+        eve.Tag(tag_ui_lds_4in1_t)
+        if (self.useBlend==1): eve.SaveContext() 
+        self.barGraphHis(x = x, y=y, w = 290, h = 180, border=1,  data=ui_4in1_sensor.temperature_data ,scale=1,blend=1)
+        if (self.useBlend==1):
+            self.blendBk(x=x,y=y,w=290,h = 180, border=1 ,scale=1,blend=1) 
+            eve.RestoreContext()
+        self.coordinateMarker(x,y,290,180,1,1,0,tvalue=self.value_t)            
+        self.eve.Tag(tag_ui_lds_4in1_a)
+        self.circle_box(x =x+xHalf, y=y, w = 290, h = 180, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a)
+        eve.BlendFunc(eve.SRC_ALPHA, eve.ONE_MINUS_SRC_ALPHA) #reset to  default 
 
-                                self.circle_box(x =x+xHalf, y=y, w = 290, h = 180, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=float( sns_value['VALUE']))
+        eve.Tag(tag_ui_lds_4in1_h)
+        self.statitics_box(x = x+xHalf, y=y+yHalf, w = 290, h = 180, border=1,data=ui_4in1_sensor.humidity_data,tvalue=self.value_h)
+        eve.Tag(tag_ui_lds_4in1_m)
+        self.boxMotion(x = x, y=y+yHalf, w = 290, h = 180, border=1)  
+        if self.value_m>=1:
+            self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_active",x =x+75, y=y+yHalf+10,fm=self.eve.ASTC_4x4)
+        else:
+            self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_inactive",x =x+75, y=y+yHalf+10,fm=self.eve.ASTC_4x4)
 
-                                eve.BlendFunc(eve.SRC_ALPHA, eve.ONE_MINUS_SRC_ALPHA) #reset to  default
-                            if  sensor['NAME'][0:1]=='H' and ui_4in1_sensor.data_gui==1:
-                                self.value_h=float( sns_value['VALUE'])
-                                self.push_humidity(self.value_h)
-                                eve.TagMask(1)
-                                eve.Tag(tag_ui_lds_4in1_h)
+  
+    def readOne(self,lds):
+        ldsuid = int(lds['DID'])
+        lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
+        """
+        Load and Parse the JSON File
+        """
+        with open(lds_object_file) as lds_json_file:
+            lds_json = json.load(lds_json_file)
+            if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
+                ss=""
+                for said, sensor in enumerate(lds_json['SNS']):
+                    sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
+                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
+                    if sns_value is not None:
+                        if len(ss) == 0:
+                            ss="%s:%-5.2f %s "% (sensor['NAME'][0:1],  float(sns_value['VALUE']), sensor['UNIT'][0:1])
+                        else: ss=ss+","+"%s:%5.2f %s "%(sensor['NAME'][0:1], float( sns_value['VALUE']), sensor['UNIT'][0:1])
+                        if  sensor['NAME'][0:1]=='T' and ui_4in1_sensor.data_gui==1:
+                            self.value_t=float( sns_value['VALUE'])
+                            self.push_temperature(self.value_t)
+                        elif  sensor['NAME'][0:1]=='A' and ui_4in1_sensor.data_gui==1:
+                            self.value_a=float( sns_value['VALUE'])
+                        elif  sensor['NAME'][0:1]=='H' and ui_4in1_sensor.data_gui==1:
+                            self.value_h=float( sns_value['VALUE'])
+                            self.push_humidity(self.value_h)
+                        elif  sensor['NAME'][0:1]=='M' and ui_4in1_sensor.data_gui==1: #Motion
+                            self.value_m=float( sns_value['VALUE'])
+                if len(self._histroy ) >= self._maxLen:
+                    self._histroy = self._histroy [1:self._maxLen]
+                self._histroy .append(ss)
 
-                                self.statitics_box(x = x+xHalf, y=y+yHalf, w = 290, h = 180, border=1,data=ui_4in1_sensor.humidity_data,tvalue=self.value_h)
+                if ui_4in1_sensor.data_gui!=1:
+                    for item in self._histroy :
+                        self.eve.cmd_text(x+50, y, 28, 0, item)
+                        y+=distance
+                        #print("%s\n"%(item ) )
+                    #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
+                return 1
+            else:
+                print ("%20s : %s ,ldsuid=%d" %  ("4in1 SENSOR PROCESS", "FAILED" ,ldsuid))
+                return -1
 
-                            if  sensor['NAME'][0:1]=='M' and ui_4in1_sensor.data_gui==1: #Motion
-                                eve.TagMask(1)
-                                eve.Tag(tag_ui_lds_4in1_m)
-        
-                                self.Progress_box(x =x, y=y+yHalf ,w = 290, h = 180, border=1, title="Motion",unit=" ", vmin=0, vmax=1, warning=1, value=float( sns_value['VALUE']))
-                                #self.circle_box(x =x, y=y+yHalf, w = 290, h = 180, border=1, title="Motion",unit="M", vmin=0, vmax=1, lwarning=1, hwarning=1, value=float( sns_value['VALUE']))
-
-                                #pass
-
-                    if len(self._histroy ) >= self._maxLen:
-                        self._histroy = self._histroy [1:self._maxLen]
-                    self._histroy .append(ss)
-
-                    if ui_4in1_sensor.data_gui!=1:
-                        for item in self._histroy :
-                            self.eve.cmd_text(x+50, y, 28, 0, item)
-                            y+=distance
-                            #print("%s\n"%(item ) )
-                        #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
-                else:
-                    print ("%20s : %s ,ldsuid=%d" %  ("4in1 SENSOR PROCESS", "FAILED" ,ldsuid))
-                 
     def draw(self):
         eve = self.eve
         layout = self.layout
@@ -220,7 +221,8 @@ class ui_4in1_sensor(ui_common):
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,eve,x,y) 
         if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-
-
- 
-           
+        ms = time.monotonic_ns() / 1000_000
+        if ms - self.last_timeout < self.readingInterval: return
+        self.last_timeout =  time.monotonic_ns() / 1000_000
+        if self.readOne(self.LDSBus_Sensor.lds)>0:
+            self.last_timeout =  time.monotonic_ns() / 1000_000
