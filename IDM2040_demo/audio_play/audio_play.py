@@ -58,6 +58,7 @@ class audio_play():
         #self.scan_file(self.media_location)
         #start ui
         self.ui.file_list(self.files)
+        self.forceStop=False
         while 1: 
             if self.event()<0:
                 break
@@ -149,15 +150,21 @@ class audio_play():
 
         if self.audio_eve.is_eof():
             # now playback is end
-            if self.loop == 0:
-                self.stop()
-            elif self.loop == 1:
-                self.stop()
-                while(self.audio_eve.is_playing()):
-                    time.sleep(0.001)
-                self.play_pauseFromFlash()
-            if self.loop == 2:
-                self.next_file()
+            print("audio_eve.is_eof",self.forceStop)
+            if self.forceStop:
+                self.audio_eve.stop();
+                self.ui.play(self.audio_eve.is_playing())
+                self.forceStop=False
+            else:
+                if self.loop == 0:
+                    self.stop()
+                elif self.loop == 1:
+                    self.stop()
+                    while(self.audio_eve.is_playing()):
+                        time.sleep(0.001)
+                    self.play_pauseFromFlash()
+                if self.loop == 2:
+                    self.next_file()
         return  0
 
     def scan_file(self, path):
@@ -214,7 +221,9 @@ class audio_play():
 
 
     def stop(self):
+        self.forceStop=True
         if self.audio_eve.is_ready() != True:
+            print('audio stop'  )
             self.audio_eve.stop();
             self.ui.play(self.audio_eve.is_playing())
         else:
