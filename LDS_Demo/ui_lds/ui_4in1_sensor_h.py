@@ -52,7 +52,7 @@ class ui_4in1_sensor_h(ui_4in1_sensor):
 
 
     def processOne(self,lds,x,y):        
-        self.statitics_box(x = x, y=y, w = 290*2, h = 180*2, border=1,data=ui_4in1_sensor.humidity_data,scale=2,tvalue=self.value_h)
+        self.statitics_box(x = x, y=y, w = self.boxW*2, h = self.boxH*2, border=1,data=ui_4in1_sensor.humidity_data,scale=2,tvalue=self.value_h)
                                           
     def draw(self):
         eve = self.eve

@@ -52,6 +52,8 @@ class ui_common(ui_config):
         self.hBk=3
         self.hBk512=4
         self.useBlend=1
+        self.boxW=272
+        self.boxH=180
         self.last_timeout =  time.monotonic_ns() / 1000_000
 
  
@@ -342,12 +344,12 @@ class ui_common(ui_config):
         self.hr_value = value
         self.last_hr = time.monotonic_ns()
 
-    def statitics_box(self, x, y, w, h, border, data=bytearray(),scale=1,tvalue=0):
+    def statitics_box(self, x, y, w, h, border, data=bytearray(),scale=1,tvalue=0,MaxMin=2):
         """ data = [[0=(timestamp) time), 1=(int) value)], ...], data from last 10 minute
         """
         e = self.eve
         MAX_VALUE=100  #40-80
-        MEASURE_MINUTE_MAX = 2 # QF 3-->6
+        MEASURE_MINUTE_MAX = MaxMin # QF 3-->6
         ROW_NUM =5 #6-->5
         ROW_LINE = ROW_NUM + 1
         PADDING_Y = PADDING_X = 30
@@ -413,7 +415,7 @@ class ui_common(ui_config):
 
         # line strips
         #MAX_TIME = num_mins * 60 #second
-        MAX_TIME = 128 #  euuql to 256/2=128 (temperature bargrah)
+        MAX_TIME = 120 #  euuql to 2HUMIDITY_MAX_SAMPLE
         W_PER_S = row_len / MAX_TIME # width pixel per second
         #H_PER_V = (ROW_HEIGHT * ROW_NUM) / (100-ROW_NUM*LINE_INTERVAL) # height pixel per second, range from 50 to 100
         H_PER_V = (ROW_HEIGHT * ROW_NUM) / (ROW_NUM*LINE_INTERVAL) # height pixel per second, range from 50 to 100
@@ -491,10 +493,10 @@ class ui_common(ui_config):
                     [0x3b8201, 0x27751b],
                 ]
         '''
-    def coordinateMarker(self,x,y,w,h,border,scale=1,blend=0,tvalue=0):
+    def coordinateMarker(self,x,y,w,h,border,scale=1,blend=0,tvalue=0,MaxMin=2):
         eve = self.eve
 
-        MEASURE_MINUTE_MAX = 2 # QF 3-->1
+        MEASURE_MINUTE_MAX = MaxMin # QF 3-->1
         MAX_VALUE=80 # 40-->80
         ROW_NUM = 5  #QF 5-->9
         ROW_LINE = ROW_NUM     #  ROW_NUM  1 ->ROW_NUM
@@ -590,7 +592,7 @@ class ui_common(ui_config):
             #print("row_len,i,_x",row_len,i,_x)
         if tvalue!=0:
             eve.ColorRGB(self._COLOR_GREEN[0],self._COLOR_GREEN[1],self._COLOR_GREEN[2])
-            if scale==1:eve.cmd_text(x + w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
+            if scale==1:eve.cmd_text(x +15+ w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
             else:eve.cmd_text(x + w/2, y + 3, 28, 0, "%3.1f"%( tvalue) )
 
     def boxMotion(self,x,y,w,h,border,scale=1,blend=0,tvalue=0):
@@ -615,7 +617,7 @@ class ui_common(ui_config):
 
     def barGraphHis(self,x,y,w,h,border,data=bytearray(),scale=1,blend=0):
         eve = self.eve
-        SAMAPP_BARGRAPH_ARRAY_SIZE=256
+        SAMAPP_BARGRAPH_ARRAY_SIZE=240
         lensTotal=360
         #numchunks=4
         numchunks=1
@@ -634,18 +636,20 @@ class ui_common(ui_config):
         eve.BitmapSource(eve.RAM_G) 
         eve.ColorRGB(109,145,145)
         #eve.ColorRGB(170,255,127)
-        eve.BitmapLayout(eve.BARGRAPH,256,1)
+        eve.BitmapLayout(eve.BARGRAPH,SAMAPP_BARGRAPH_ARRAY_SIZE,1)
         if scale==1:
-            eve.cmd_setbitmap(bmAdd, eve.BARGRAPH, 256, bmWidth)
-            eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,256,bmWidth)
+            eve.cmd_setbitmap(bmAdd, eve.BARGRAPH, SAMAPP_BARGRAPH_ARRAY_SIZE, bmWidth)
+            eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,SAMAPP_BARGRAPH_ARRAY_SIZE,bmWidth)
             eve.BitmapSizeH(0,0)
         else:
-            eve.cmd_setbitmap(bmAdd, eve.BARGRAPH, 256, bmWidth)
+            eve.cmd_setbitmap(bmAdd, eve.BARGRAPH, SAMAPP_BARGRAPH_ARRAY_SIZE, bmWidth)
             eve.BitmapTransformA(0,128)  #double
             #eve.BitmapTransformE(0,128)
             eve.BitmapTransformE(0,int(self.bb ))
-            eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,0,int(self.aa*bmWidth))
-            eve.BitmapSizeH(1,0)
+#             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,0,int(self.aa*bmWidth))
+#             eve.BitmapSizeH(1,0)
+            eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,SAMAPP_BARGRAPH_ARRAY_SIZE*2,int(self.aa*bmWidth))
+            eve.BitmapSizeH(0,0)
  
         result=bytearray(b'\x0ff')*(SAMAPP_BARGRAPH_ARRAY_SIZE)
 
@@ -678,6 +682,7 @@ class ui_common(ui_config):
        
     def blendBk(self,x,y,w,h,border,scale=1,blend=0):
         eve = self.eve
+        SAMAPP_BARGRAPH_ARRAY_SIZE=240
         PADDING_Y = PADDING_X = 30
         bmWidth=96   # 128->96
         bmAdd=1024*1024 - 200*1024
@@ -690,14 +695,16 @@ class ui_common(ui_config):
 
         if scale==1:
             eve.BitmapHandle(self.hBk512)
-            eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,256,bmWidth)
+            eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,SAMAPP_BARGRAPH_ARRAY_SIZE,bmWidth)
             eve.BitmapSizeH(0,0)
         elif scale==2:
             eve.BitmapHandle(self.hBk512)
             #eve.BitmapTransformA(0,128)  #double
             #eve.BitmapTransformE(0,int(self.bb ))
-            eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,0,int(self.aa*bmWidth))
-            eve.BitmapSizeH(1,0)
+#             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,0,int(self.aa*bmWidth))
+#             eve.BitmapSizeH(1,0)
+            eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,SAMAPP_BARGRAPH_ARRAY_SIZE*2,int(self.aa*bmWidth))
+            eve.BitmapSizeH(0,0)
 
 
         eve.Begin(eve.BITMAPS)

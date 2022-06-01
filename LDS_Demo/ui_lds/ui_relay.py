@@ -138,6 +138,7 @@ class ui_relay(ui_config):
         eve = self.eve
         ldsuid = int(lds['DID'])
         counter=0
+        error=1
         if self.firstTime:  
             #self.firstTime=False;
             print("ldsuid:",ldsuid, "OBJ:",lds['OBJ'] ," lds:",lds)
@@ -149,10 +150,10 @@ class ui_relay(ui_config):
         with open(lds_object_file) as lds_json_file:
             lds_json = json.load(lds_json_file)
             self.lds_json=lds_json
-            ss=""
-            for said, sensor in enumerate(lds_json['SNS']):
-                time.sleep(0.01)
-                if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
+            if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
+                ss=""
+                for said, sensor in enumerate(lds_json['SNS']):
+                    time.sleep(0.002)
                     sns_value = self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
                     #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
                     if self.firstTime:print ("DID=%d %20s :type:%s %s "%  (ldsuid,sensor['NAME'],  sensor['TYPE'],sns_value) )
@@ -162,9 +163,11 @@ class ui_relay(ui_config):
                             self.relayStatus[sensor['NAME']]=vv
                             print("%s changed  %s" % (sensor['NAME'],self.relayStatus[sensor['NAME']] ))
                         counter+=1
-#            if counter<4:print ("Error when reading Relay Data:%d"%  ( counter) )                        
+            else:rcode=-1
+#            if counter<4:print ("Error when reading Relay Data:%d"%  ( counter) )
         if self.firstTime:  
             self.firstTime=False
+        return error
                    
     def draw(self):
         eve = self.eve
@@ -192,4 +195,4 @@ class ui_relay(ui_config):
         ms = time.monotonic_ns() / 1000_000
         if ms - self.last_timeout < self.readingInterval: return
         self.last_timeout =  time.monotonic_ns() / 1000_000
-        self.readOne(self.LDSBus_Sensor.lds)
+        if self.readOne(self.LDSBus_Sensor.lds)>0:self.last_timeout =  time.monotonic_ns() / 1000_000

@@ -58,13 +58,14 @@ class ui_co2_sensor_t(ui_co2_sensor):
 
 
     def processOne(self,lds,x,y):
+        boxW=self.boxW   
+        boxH=self.boxH
         if (self.useBlend==1): self.eve.SaveContext() 
-        self.barGraphHis(x = x, y=y, w = 290, h = 180, border=1,data=ui_co2_sensor.temperature_data,scale=2)
-        #self.blendBk(x=x,y=y,w=290,h = 180, border=1,scale=2) 
+        self.barGraphHis(x = x, y=y, w = boxW, h = boxH, border=1,data=ui_co2_sensor.temperature_data,scale=2)
         if (self.useBlend==1):
-            self.blendBk(x=x,y=y,w=290,h = 180, border=1,scale=2,blend=1) 
+            self.blendBk(x=x,y=y,w=boxW,h = boxH, border=1,scale=2,blend=1) 
             self.eve.RestoreContext()
-        self.coordinateMarker(x,y,2*290,2*180,0,2,0,tvalue=self.value_t) 
+        self.coordinateMarker(x,y,2*boxW,2*boxH,0,2,0,tvalue=self.value_t,MaxMin=4) 
 
     def draw(self):
         eve = self.eve

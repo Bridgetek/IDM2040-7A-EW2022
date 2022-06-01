@@ -51,7 +51,7 @@ class ui_co2_sensor_h(ui_co2_sensor):
             print("tag_ui_lds_data_text")
 
     def processOne(self,lds,x,y):
-        self.statitics_box(x = x, y=y, w = 290*2, h = 180*2, border=1,data=ui_co2_sensor.humidity_data,scale=2,tvalue=self.value_h)
+        self.statitics_box(x = x, y=y, w = self.boxW*2, h = self.boxH*2, border=1,data=ui_co2_sensor.humidity_data,scale=2,tvalue=self.value_h,MaxMin=4)
                  
     def draw(self):
         eve = self.eve

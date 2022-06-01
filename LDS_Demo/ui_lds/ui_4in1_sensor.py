@@ -24,10 +24,10 @@ else:
 
 class ui_4in1_sensor(ui_common):
     data_gui=1
-    HUMIDITY_MAX_SAMPLE=128
+    HUMIDITY_MAX_SAMPLE=120
     humidity_sample_num = 0
     humidity_data=[[0, 0]] * HUMIDITY_MAX_SAMPLE
-    temperature_MAX_SAMPLE=128
+    temperature_MAX_SAMPLE=HUMIDITY_MAX_SAMPLE
     temperature_sample_num = 0
     temperature_data=[[0, 0]] *temperature_MAX_SAMPLE
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
@@ -132,24 +132,26 @@ class ui_4in1_sensor(ui_common):
     def processOne(self,lds,eve,x,y):
         xHalf=410
         yHalf=205
+        boxW=self.boxW   
+        boxH=self.boxH
         distance = 30
         ldsuid = int(lds['DID'])      
         eve.TagMask(1)
         eve.Tag(tag_ui_lds_4in1_t)
         if (self.useBlend==1): eve.SaveContext() 
-        self.barGraphHis(x = x, y=y, w = 290, h = 180, border=1,  data=ui_4in1_sensor.temperature_data ,scale=1,blend=1)
+        self.barGraphHis(x = x, y=y, w = boxW, h = boxH, border=1,  data=ui_4in1_sensor.temperature_data ,scale=1,blend=1)
         if (self.useBlend==1):
-            self.blendBk(x=x,y=y,w=290,h = 180, border=1 ,scale=1,blend=1) 
+            self.blendBk(x=x,y=y,w=boxW,h = boxH, border=1 ,scale=1,blend=1) 
             eve.RestoreContext()
-        self.coordinateMarker(x,y,290,180,1,1,0,tvalue=self.value_t)            
+        self.coordinateMarker(x,y,boxW,boxH,1,1,0,tvalue=self.value_t)            
         self.eve.Tag(tag_ui_lds_4in1_a)
-        self.circle_box(x =x+xHalf, y=y, w = 290, h = 180, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a)
+        self.circle_box(x =x+xHalf, y=y, w = boxW, h = boxH, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a)
         eve.BlendFunc(eve.SRC_ALPHA, eve.ONE_MINUS_SRC_ALPHA) #reset to  default 
 
         eve.Tag(tag_ui_lds_4in1_h)
-        self.statitics_box(x = x+xHalf, y=y+yHalf, w = 290, h = 180, border=1,data=ui_4in1_sensor.humidity_data,tvalue=self.value_h)
+        self.statitics_box(x = x+xHalf, y=y+yHalf, w = boxW, h = boxH, border=1,data=ui_4in1_sensor.humidity_data,tvalue=self.value_h)
         eve.Tag(tag_ui_lds_4in1_m)
-        self.boxMotion(x = x, y=y+yHalf, w = 290, h = 180, border=1)  
+        self.boxMotion(x = x, y=y+yHalf, w = boxW, h = boxH, border=1)  
         if self.value_m>=1:
             self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_active",x =x+75, y=y+yHalf+10,fm=self.eve.ASTC_4x4)
         else:

@@ -53,14 +53,27 @@ class ui_4in1_sensor_t(ui_4in1_sensor):
         elif tag == tag_ui_lds_data_text:     
             ui_4in1_sensor.data_gui=0
             print("tag_ui_lds_data_text")
-  
-    def processOne(self,lds,x,y):                      
+
+    def boxE(self, x, y, w, h, border=1):
+        e = self.eve
+        # big border
+        e.ColorRGB(255, 255, 255)
+        e.Begin(e.RECTS)
+        e.LineWidth(1)
+        e.Vertex2f(x, y)
+        e.Vertex2f(x + w, y + h)
+        
+    def processOne(self,lds,x,y):
+        boxW=self.boxW 
+        boxH=self.boxH
         if (self.useBlend==1): self.eve.SaveContext() 
-        self.barGraphHis(x = x, y=y, w = 290, h = 180, border=1,data=ui_4in1_sensor.temperature_data,scale=2, blend=1) 
+        self.barGraphHis(x = x, y=y, w = boxW, h = boxH, border=1,data=ui_4in1_sensor.temperature_data,scale=2, blend=1) 
         if (self.useBlend==1):
-            self.blendBk(x=x,y=y,w=290,h = 180, border=1,scale=2  ,blend=1) 
+            self.blendBk(x=x,y=y,w=boxW,h = boxH, border=1,scale=2  ,blend=1) 
             self.eve.RestoreContext()
-        self.coordinateMarker(x,y,2*290,2*180,0,2,0 ,tvalue=self.value_t)
+        self.coordinateMarker(x,y,2*boxW,2*boxH,0,2,0 ,tvalue=self.value_t)
+        PADDING_X=30
+        #self.boxE(x+PADDING_X+1, y+1, boxW*2-PADDING_X-2,boxH*2-PADDING_X-2)
                         
                  
     def draw(self):
