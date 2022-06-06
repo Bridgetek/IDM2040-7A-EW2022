@@ -1,5 +1,4 @@
 import time
-
 from .tags import *
 from .helper_gesture import helper_gesture
 
@@ -31,10 +30,8 @@ class audio_eve():
 
         # self.eve.cmd_flashdetach()
         # self.wait_flush()
-
         # self.eve.cmd_flashattach()
         # self.wait_flush()
-
         # self.eve.cmd_flashfast()
         # self.wait_flush()
 
