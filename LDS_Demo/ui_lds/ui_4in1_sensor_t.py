@@ -27,7 +27,7 @@ class ui_4in1_sensor_t(ui_4in1_sensor):
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
         super().__init__(eve , helper, gesture, layout,LDSBus_Sensor)
         #self.ui_main = ui_main
-        self.title="LDS 4In1 Sensor(Temperature)"
+        self.title="LDSBus 4in1 Sensor(Temperature)"
         
         self.useBlend=1
 

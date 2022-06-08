@@ -12,8 +12,6 @@ from .ui_common import ui_common
 from .ui_4in1_sensor import ui_4in1_sensor
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -27,7 +25,7 @@ class ui_4in1_sensor_m(ui_4in1_sensor):
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
         super().__init__(eve , helper, gesture, layout,LDSBus_Sensor)
         #self.ui_main = ui_main
-        self.title="LDS 4In1 Sensor(Motion)"
+        self.title="LDSBus 4in1 Sensor(Motion)"
         
  
     def event(self):

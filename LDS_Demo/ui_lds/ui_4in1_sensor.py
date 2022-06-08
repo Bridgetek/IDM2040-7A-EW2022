@@ -12,8 +12,6 @@ from .ui_common import ui_common
 from .ui_common import ui_config
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -34,7 +32,7 @@ class ui_4in1_sensor(ui_common):
         #super().__init__(eve,helper,gesture,layout,LDSBus_Sensor)
         ui_common.__init__(self,eve,helper,gesture,layout,LDSBus_Sensor)
 
-        self.title="LDS 4In1 Sensor"
+        self.title="LDSBus 4in1 Sensor"
         self.value_t=0 
         self.value_h=0     
         self.value_a=0
@@ -145,7 +143,7 @@ class ui_4in1_sensor(ui_common):
             eve.RestoreContext()
         self.coordinateMarker(x,y,boxW,boxH,1,1,0,tvalue=self.value_t)            
         self.eve.Tag(tag_ui_lds_4in1_a)
-        self.circle_box(x =x+xHalf, y=y, w = boxW, h = boxH, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a)
+        self.circle_box(x =x+xHalf, y=y, w = boxW, h = boxH, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=100, hwarning=900, value=self.value_a)
         eve.BlendFunc(eve.SRC_ALPHA, eve.ONE_MINUS_SRC_ALPHA) #reset to  default 
 
         eve.Tag(tag_ui_lds_4in1_h)
@@ -153,9 +151,9 @@ class ui_4in1_sensor(ui_common):
         eve.Tag(tag_ui_lds_4in1_m)
         self.boxMotion(x = x, y=y+yHalf, w = boxW, h = boxH, border=1)  
         if self.value_m>=1:
-            self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_active",x =x+75, y=y+yHalf+10,fm=self.eve.ASTC_4x4)
+            self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_active",x =x+60, y=y+yHalf+10,fm=self.eve.ASTC_4x4)
         else:
-            self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_inactive",x =x+75, y=y+yHalf+10,fm=self.eve.ASTC_4x4)
+            self.layout.draw_asset_MCU(tag_ui_lds_4in1_m,"m_inactive",x =x+60, y=y+yHalf+10,fm=self.eve.ASTC_4x4)
 
   
     def readOne(self,lds):

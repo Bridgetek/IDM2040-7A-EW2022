@@ -151,31 +151,31 @@ class ui_main():
             self.ui_lds_Details.ui_previous=self.ui_active.title
             self.ui_active = self.ui_lds_Details  
         elif tag == tag_ui_lds_info_back:
-            if ( self.ui_lds_Details.ui_previous.startswith("LDS 4In1 Sensor") ): 
+            if ( self.ui_lds_Details.ui_previous.startswith("LDSBus 4in1 Sensor") ): 
                 self.ui_lds_Details.ui_previous=self.ui_active.title 
                 self.ui_active = self.ui_4in1_sensor
-            elif ( self.ui_lds_Details.ui_previous.startswith("LDS CO2 Sensor")):   
+            elif ( self.ui_lds_Details.ui_previous.startswith("LDSBus CO2 Sensor")):   
                 self.ui_lds_Details.ui_previous=self.ui_active.title
                 self.ui_active = self.ui_co2_sensor
-            elif ( self.ui_lds_Details.ui_previous.startswith("LDS 2Ch Relay")):   
+            elif ( self.ui_lds_Details.ui_previous.startswith("LDSBus 2Ch Relay")):   
                 self.ui_lds_Details.ui_previous=self.ui_active.title
                 self.ui_active = self.ui_relay
             print("tag_ui_lds_info_back",self.ui_lds_Details.ui_previous)
         elif tag == tag_ui_lds_back:
  
-            if ( self.ui_active.title=="LDS 4In1 Sensor"):   self.ui_active = self.ui_lds_scan
-            elif ( self.ui_active.title=="LDS 4In1 Sensor(Temperature)"):   self.ui_active = self.ui_4in1_sensor
-            if ( self.ui_active.title=="LDS 4In1 Sensor(Humidity)"):   self.ui_active = self.ui_4in1_sensor
-            elif ( self.ui_active.title=="LDS 4In1 Sensor(Ambient)"):   self.ui_active = self.ui_4in1_sensor
-            elif ( self.ui_active.title=="LDS 4In1 Sensor(Motion)"):   self.ui_active = self.ui_4in1_sensor
-            elif ( self.ui_active.title=="LDS CO2 Sensor"):   self.ui_active = self.ui_lds_scan
-            elif ( self.ui_active.title=="LDS CO2 Sensor(Temperature)"):   self.ui_active = self.ui_co2_sensor
-            elif ( self.ui_active.title=="LDS CO2 Sensor(Humidity)"):   self.ui_active = self.ui_co2_sensor
-            elif ( self.ui_active.title=="LDS CO2 Sensor(Ambient)"):   self.ui_active = self.ui_co2_sensor
-            elif ( self.ui_active.title=="LDS CO2 Sensor(CO2)"):   self.ui_active = self.ui_co2_sensor
-            elif ( self.ui_active.title=="LDS 2Ch Relay"):   self.ui_active = self.ui_lds_scan
-            elif ( self.ui_lds_Details.ui_previous=="LDS 2Ch Relay"):   self.ui_active = self.ui_relay
-            print("tag_ui_lds_back",self.ui_lds_Details.ui_previous)
+            if ( self.ui_active.title=="LDSBus 4in1 Sensor"):   self.ui_active = self.ui_lds_scan
+            elif ( self.ui_active.title=="LDSBus 4in1 Sensor(Temperature)"):   self.ui_active = self.ui_4in1_sensor
+            if ( self.ui_active.title=="LDSBus 4in1 Sensor(Humidity)"):   self.ui_active = self.ui_4in1_sensor
+            elif ( self.ui_active.title=="LDSBus 4in1 Sensor(Ambient)"):   self.ui_active = self.ui_4in1_sensor
+            elif ( self.ui_active.title=="LDSBus 4in1 Sensor(Motion)"):   self.ui_active = self.ui_4in1_sensor
+            elif ( self.ui_active.title=="LDSBus CO2 Sensor"):   self.ui_active = self.ui_lds_scan
+            elif ( self.ui_active.title=="LDSBus CO2 Sensor(Temperature)"):   self.ui_active = self.ui_co2_sensor
+            elif ( self.ui_active.title=="LDSBus CO2 Sensor(Humidity)"):   self.ui_active = self.ui_co2_sensor
+            elif ( self.ui_active.title=="LDSBus CO2 Sensor(Ambient)"):   self.ui_active = self.ui_co2_sensor
+            elif ( self.ui_active.title=="LDSBus CO2 Sensor(CO2)"):   self.ui_active = self.ui_co2_sensor
+            elif ( self.ui_active.title=="LDSBus 2Ch Relay"):   self.ui_active = self.ui_lds_scan
+            elif ( self.ui_lds_Details.ui_previous=="LDSBus 2Ch Relay"):   self.ui_active = self.ui_relay
+            print("tag_ui_lds_back",self.ui_active.title,self.ui_lds_Details.ui_previous)
 
         elif tag == tag_ui_lds_4in1_t:
             self.ui_active = self.ui_4in1_sensor_t

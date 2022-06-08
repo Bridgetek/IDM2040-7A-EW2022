@@ -11,8 +11,6 @@ from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_config import ui_config
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -212,7 +210,7 @@ class ui_common(ui_config):
         # last gray part
         e.ColorRGB(c1[0], c1[1], c1[2])
         e.PointSize(_size)
-        for num in list(range(0, 20, 5)) + list(range(_max_degree - 20, _max_degree, 5)):
+        for num in list(range(0, 20, 5)) + list(range(_max_degree - 20, _max_degree, 2)):
             num +=_ROTATE + _skip_low  + _size / 4 #rotate circle by 90 degree and center down
             num %=360
             num=math.radians(num)
@@ -233,6 +231,7 @@ class ui_common(ui_config):
             e.Vertex2f(posX, posY)
         e.End()
 
+
         e.StencilFunc(e.ALWAYS, 0x00, 0xFF)
         e.StencilOp(e.KEEP, e.KEEP)
 
@@ -244,6 +243,7 @@ class ui_common(ui_config):
 
         e.cmd_text(x + (w / 2) - (r/3), _y + r, 21, e.OPT_RIGHTX, str(vmin))
         e.cmd_text(x + (w / 2) + (r/3), _y + r, 21, 0           , str(vmax))
+
 
         # Warning line
         for i in lwarning, hwarning:
@@ -279,7 +279,7 @@ class ui_common(ui_config):
             e.Vertex2f(posX2, posY2)
 
             e.ColorRGB(255, 255, 255)
-            e.cmd_text(textX, textY, 16, opt, str(round(i, 1)))
+            e.cmd_text(textX, textY, 21, opt, str(round(i, 1)))
 
     def _time_str(self, hh, mm, isnext = 0) :
         """ isnext != 0: return hour:minute before hh:mm

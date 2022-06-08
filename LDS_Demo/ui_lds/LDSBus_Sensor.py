@@ -96,7 +96,7 @@ class LDSBus_Sensor(ui_config):
     def simulator(self,sensor):
         sns='{"VALUE": "1"}'
         if  sensor['NAME'][0:1]=='T': sns='{"VALUE":"'+str(randint(20,27))+ '"}'
-        if  sensor['NAME'][0:1]=='A': sns='{"VALUE":"'+str(randint(75,85))+ '"}'
+        if  sensor['NAME'][0:1]=='A': sns='{"VALUE":"'+str(randint(190,220))+ '"}'
         #if  sensor['NAME'][0:1]=='H': sns='{"VALUE":"'+str(randint(80,95))+ '"}'
         if  sensor['NAME'][0:1]=='H': sns='{"VALUE":"'+str(randint(55,70))+ '"}'
         if  sensor['NAME'][0:1]=='M': sns='{"VALUE":"'+str(randint(0,1))+ '"}'

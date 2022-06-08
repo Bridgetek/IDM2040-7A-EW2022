@@ -12,8 +12,6 @@ from .ui_common import ui_common
 from .ui_4in1_sensor import ui_4in1_sensor
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -27,7 +25,7 @@ class ui_4in1_sensor_a(ui_4in1_sensor):
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
         super().__init__(eve , helper, gesture, layout,LDSBus_Sensor)
         #self.ui_main = ui_main
-        self.title="LDS 4In1 Sensor(Ambient)"  
+        self.title="LDSBus 4in1 Sensor(Ambient)"  
  
     def event(self):
         eve = self.eve
@@ -51,7 +49,7 @@ class ui_4in1_sensor_a(ui_4in1_sensor):
         
 
     def processOne(self,lds,eve,x,y):
-        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a ,tsize=31,scale=2) 
+        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=100, hwarning=900, value=self.value_a ,tsize=31,scale=2) 
                          
     def draw(self):
         eve = self.eve

@@ -27,7 +27,7 @@ class ui_lds_Details(ui_config):
         self.gesture = gesture
         self.layout = layout
         self.LDSBus_Sensor = LDSBus_Sensor
-        self.title="LDS Details"
+        self.title="LDSBus Details"
         self._rescan=True
         self.ui_previous=""
         #self._rescan=False

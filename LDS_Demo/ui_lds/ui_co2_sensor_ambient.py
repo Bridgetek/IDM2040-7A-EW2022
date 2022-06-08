@@ -27,7 +27,7 @@ class ui_co2_sensor_ambient(ui_co2_sensor):
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
         super().__init__(eve , helper, gesture, layout,LDSBus_Sensor)
         #self.ui_main = ui_main
-        self.title="LDS CO2 Sensor(Ambient)"
+        self.title="LDSBus CO2 Sensor(Ambient)"
         
 
     def event(self):
@@ -51,7 +51,7 @@ class ui_co2_sensor_ambient(ui_co2_sensor):
             print("tag_ui_lds_data_text")
         
     def processOne(self,lds,x,y):
-        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a,tsize=31,scale=2)
+        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=100, hwarning=900, value=self.value_a,tsize=31,scale=2)
                  
     def draw(self):
         eve = self.eve

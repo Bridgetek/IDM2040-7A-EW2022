@@ -34,7 +34,7 @@ class ui_co2_sensor(ui_common):
         super().__init__(eve,helper,gesture,layout,LDSBus_Sensor)
 
         #self.ui_main = ui_main
-        self.title="LDS CO2 Sensor"
+        self.title="LDSBus CO2 Sensor"
         self.value_co2=0 
         self.value_t=0 
         self.value_h=0     
@@ -142,14 +142,14 @@ class ui_co2_sensor(ui_common):
             self.coordinateMarker(x,y,width,boxH,1,1,0,tvalue=self.value_t,MaxMin=4)
             self.eve.Tag(tag_ui_lds_co2_a)
             if (self.useBlend==1): self.eve.SaveContext() 
-            self.circle_box(x =x+xHalf, y=y, w = width, h = boxH, border=1, title="Ambient",unit="L", vmin=0, vmax=1000, lwarning=10, hwarning=800, value=self.value_a)
+            self.circle_box(x =x+xHalf, y=y, w = width, h = boxH, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=100, hwarning=900, value=self.value_a)
             if (self.useBlend==1):self.eve.RestoreContext()
             self.eve.Tag(tag_ui_lds_co2_h)
             if (self.useBlend==1): self.eve.SaveContext() 
             self.statitics_box(x = x+xHalf, y=y+yHalf, w = width, h = boxH, border=1,data=ui_co2_sensor.humidity_data ,tvalue=self.value_h,MaxMin=4)
             if (self.useBlend==1):self.eve.RestoreContext()
             self.eve.Tag(tag_ui_lds_co2_co2)
-            self.circle_box(x =x, y=y+yHalf, w = width, h = boxH, border=1, title="CO2",unit="ppm", vmin=0, vmax=30000, lwarning=100, hwarning=25000, value=self.value_co2)
+            self.circle_box(x =x, y=y+yHalf, w = width, h = boxH, border=1, title="CO2",unit="ppm", vmin=0, vmax=30000, lwarning=400, hwarning=27000, value=self.value_co2)
 
 
     def readOne(self,lds):

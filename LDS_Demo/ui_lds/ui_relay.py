@@ -26,7 +26,7 @@ class ui_relay(ui_config):
         self.layout = layout
         self.LDSBus_Sensor = LDSBus_Sensor
         #self.ui_main = ui_main
-        self.title="LDS 2Ch Relay"
+        self.title="LDSBus 2Ch Relay"
         self.ldsuid=-1
         self.lds_json=None
         self.relay_state=[ True, False ]       
