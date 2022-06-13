@@ -9,7 +9,7 @@ from brteve.brt_eve_rp2040 import BrtEveRP2040
 from brteve.brt_eve_bt817_8 import BrtEve
 import busio
 import board
-
+from main_menu.eve_tools import snapshot2
 from adafruit_apds9960 import apds9960 as APDS9960_Sensor
 
 import pulseio
@@ -103,6 +103,7 @@ class image_viewer:
         if use_touch:touch_ges = gesture(self.eve)
         #touch_ges = gesture()
         tag_Back=1
+        t = 0
         print("ready to loop ")
         while True:
             #await asyncio.sleep(0.01) 
@@ -129,7 +130,9 @@ class image_viewer:
                 elif ges == 'down' :
                      print("back")
                      break
-
+            if t==10:
+                snapshot2(eve,"imageviewer")
+            t += 1
 
 
                 #eve.cmd_dlstart() #  cause problem

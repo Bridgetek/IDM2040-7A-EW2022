@@ -13,9 +13,8 @@
 import math
 from brteve.brt_eve_bt817_8 import BrtEve
 from brteve.brt_eve_rp2040 import BrtEveRP2040
+from main_menu.eve_tools import snapshot2
 
-
- 
 def test():
     print("test fun")
     
@@ -347,6 +346,7 @@ class cube:
         tag_count=1
         tag_Back=tag_count;tag_count+=1
         print("ready to loop/tag")
+        t = 0
         while 1:
             eve.cmd_dlstart()
             eve.VertexFormat(2) # cube can't be displayed without that one
@@ -401,7 +401,9 @@ class cube:
             #except  CoprocessorException as e:
             except  Exception as e:
                 print("exceprion:",e)
-                pass
+            if t==10:
+                snapshot2(eve,"cube")
+            t += 1
 
         eve.cmd_dlstart() #  cause problem
         eve.VertexFormat(2)

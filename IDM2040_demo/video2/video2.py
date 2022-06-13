@@ -66,7 +66,8 @@ def play_video_from_eve_flash(eve: BrtEve, file, blob=''):
     # if yes == True:
     #     flash_video(eve, file, blob)
     print("play_video_from_eve_flash")
-    mp = eve.movie_player_from_flash(1267520)
+    mp = eve.movie_player_from_flash(1149568)
+    #mp = eve.movie_player_from_flash(1242432)
     #mp.play()
     play(eve)
     

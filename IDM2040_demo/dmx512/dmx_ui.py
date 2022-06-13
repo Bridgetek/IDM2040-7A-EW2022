@@ -11,7 +11,7 @@ import array
 import ulab.numpy as np
 import board
 from .dmx512 import dmx512
-
+from main_menu.eve_tools import snapshot2
 
 tag_count=1
 tag_reset=tag_count;tag_count+=1
@@ -91,6 +91,8 @@ class dmx_ui(object):
         self.hColorwheel=0
         self.message='please pick color'
         self.workMode='text'
+        self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.wInterval=100 # write to DMX   interval
  
 
         self.c_w=0
@@ -107,8 +109,10 @@ class dmx_ui(object):
             ((1.0, 1.0, 1.0), (  0  , 0.0, 1.0)), # white
             ((0.5, 0.5, 0.5), (  0  , 0.0, 0.5)), # grey
         ]
-
- 
+        self.lastTouch=time.monotonic_ns() / 1000_000
+        self.touchCounter=0
+        self.longTouch=0
+        self.snapCounter=0
 
         
     def hsv_to_rgb(self,h, s, v):
@@ -176,23 +180,51 @@ class dmx_ui(object):
           self.dmx.write_frame() # re-write  
     def processEvent(self,tag,touch):
         tagReleased=touch.tagReleased
-        # only send to DMX512 after released
         if tagReleased==tag_lightness:
+            self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)  
             self.updateRGB()
+            print("release lightness",self.lightness)
         elif tagReleased==tag_white:
             self.writeOneFrame(self.rgb,self.tWhitePercent)
-        
+
+        if touch.isTouch:
+            ms = time.monotonic_ns() / 1000_000
+            #print("ms " ,ms,(ms - self.lastTouch))
+            if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
+                self.touchCounter+=1
+                if self.touchCounter>9:
+                    self.touchCounter=0
+                    self.longTouch=1
+            else:
+                self.touchCounter=0
+                self.longTouch=0
+            self.lastTouch=ms
+        else:
+                self.touchCounter=0
+                self.longTouch=0            
+            
+        if self.longTouch:
+                snapshot2(self.eve,"dmx512_"+str(self.snapCounter))
+                self.snapCounter+=1
+            
+        if not touch.isTouch:
+            return 0
+  
+  
         if tag == tag_Back:
             print("back")
             return -1
         elif tag == tag_lightness:
-         vv=touch.tagTrackTouched>>16
-         self.lightness=255*(vv/65535)
-         self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)
+            vv=touch.tagTrackTouched>>16
+            self.lightness=255*(vv/65535)
+            #self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness) # it takes time
+            self.tWhitePercent=0
+            print("lightness",self.lightness)
         elif tag == tag_white:
            vv=touch.tagTrackTouched>>16
            self.tWhitePercent=100*(vv/65535)
            self.rgb=(0,0,0)
+           #print("tWhitePercent",self.tWhitePercent)
         elif tag == tag_colorpicker:
             #print("touch",touch.touchX,touch.touchY)
             x0=self.x0+self.radius
@@ -200,7 +232,7 @@ class dmx_ui(object):
             x1=touch.touchX
             y1=touch.touchY
             if x1==32768 or y1==32768:
-                print("invalid touch",x1,y1)
+                print("invalid touch tag_colorpicker",x1,y1)
                 return 0
             self.sat=self.getSat(x0,y0,x1,y1,self.radius)
             self.hue=self.getHue(x0,y0,x1,y1)
@@ -249,13 +281,13 @@ class dmx_ui(object):
             eve.cmd_fgcolor(0x003870)  # default
             eve.cmd_bgcolor(0x002040)  # 
 
-            eve.cmd_text(10, 5, 30, 0, "DMX512 Testing" )  
+            eve.cmd_text(10, 5, 30, 0, "DMX512" )  
             eve.Tag(tag_Back)
             eve.cmd_button(700, 5, 85,35,30, 0, "Back")
             
             x=self.x0; y=self.y0
             w=300
-            h=250
+            h=320
             
 #             eve.Tag(tag_all_red)
 #             eve.cmd_button(50, 400, 130,35,31, 0, "RED")
@@ -277,23 +309,24 @@ class dmx_ui(object):
             eve.ColorRGB(self.rgb[0], self.rgb[1], self.rgb[2])
             eve.Begin(eve.RECTS)
             eve.LineWidth(5)
-            eve.Vertex2f(x+350, y+80)
+            eve.Vertex2f(x+350, y+100)
             eve.Vertex2f(x +350+w, y+h)
             
-            eve.cmd_text(x +350, y+h+30, 28, 0, self.message)
+            #eve.cmd_text(x +350, y+h+30, 28, 0, self.message)
             
-            h=15
+            h=25
             eve.cmd_fgcolor(0xffffff)
             eve.cmd_bgcolor(0xffffff)   
             eve.ColorRGB(0xff,0xff,0xff)
-            eve.cmd_text(x+350, y, 28, 0, "White LED lightness" )
+            eve.cmd_text(x+350, y-20, 28, 0, "White LED lightness" )
             eve.TagMask(1)
             eve.Tag(tag_white)
             eve.cmd_track(x+350, y+35, w, h, tag_white)
             eve.cmd_slider(x+350, y+35, w, h, 0, self.tWhitePercent, 100)
 
             
-            y= y+280
+
+            y= y+300
             eve.cmd_fgcolor(0xffffff)
             eve.cmd_bgcolor(0xffffff)  
             eve.ColorRGB(0xff,0xff,0xff)
@@ -306,9 +339,12 @@ class dmx_ui(object):
             eve.Display()
             eve.cmd_swap()   
             eve.flush() 
-            if self.processEvent(touch.tagPressed,touch)<0: break      
-            time.sleep(0.001)
-            #if (t==1): break 
+            if self.processEvent(touch.tagPressed,touch)<0: break
+            ms = time.monotonic_ns() / 1000_000
+            if ms - self.last_timeout > self.wInterval:
+                self.last_timeout =  ms
+                self.updateRGB()       
+            time.sleep(0.0001)
             t+=1
             #print(t)
         print("clear")

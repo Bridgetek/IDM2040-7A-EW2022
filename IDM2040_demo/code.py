@@ -7,6 +7,8 @@ import sys
 import time
 import gc
 
+from main_menu.eve_tools import snapshot2
+
 from main_menu.brt_eve_rp2040_dmx import BrtEveRP2040_dmx as BrtEveRP2040
 
 if sys.implementation.name == "circuitpython":
@@ -32,19 +34,27 @@ class main_app():
         # eve.wr32(eve.REG_TOUCH_TRANSFORM_E, 0xfffefc79)
         # eve.wr32(eve.REG_TOUCH_TRANSFORM_F, 0x32c3211)
 
-        eve=self.eve  
- 
-
+        eve=self.eve
+        self.x0=20
+        self.y0=10
+        self.x1=50
+        self.y1=120
+        self.xmargin=100
+        self.ymargin=50
+        self.lastTouch=time.monotonic_ns() / 1000_000
+        self.touchCounter=0
+        self.longTouch=0
+        
     def drawBtn(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)
-        y =  90
+        y =  self.y1
         btn_w = 300
         btn_h = 60
-        xmargin =100
+        xmargin =self.xmargin=100
         center = 200
-        x1 = 50
-        ymargin =40
+        x1 = self.x1
+        ymargin =self.ymargin
         x2 = x1 + btn_w + xmargin
         x3 = x2 + btn_w + xmargin
         x4 = x3 + btn_w + xmargin
@@ -61,7 +71,7 @@ class main_app():
         eve.Tag(tag_dmx512_demo)
         eve.cmd_button(x2, y2, btn_w, btn_h, 31, 0, "DMX512 Demo")        
         eve.Tag(tag_audio_playback)
-        eve.cmd_button(x1, y3, btn_w, btn_h, 31, 0, "Audio playback")
+        eve.cmd_button(x1, y3, btn_w, btn_h, 31, 0, "Audio Playback")
         eve.Tag(tag_video_playback)
         eve.cmd_button(x2, y3, btn_w, btn_h, 31, 0, "Video Playback")
   
@@ -80,9 +90,30 @@ class main_app():
         eve = self.eve     
         tag = eve.rd32(eve.REG_TOUCH_TAG) & 0xFF       
         return tag
-
+                   
     def processEvent(self,tag):
         eve = self.eve
+        is_touch = eve.rd32(eve.REG_TOUCH_RAW_XY) != 0xFFFFFFFF
+        if is_touch:
+            ms = time.monotonic_ns() / 1000_000
+            #print("ms " ,ms,(ms - self.lastTouch))
+            if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
+                self.touchCounter+=1
+                if self.touchCounter>9:
+                    self.touchCounter=0
+                    self.longTouch=1
+                    print("longTouch " ,self.longTouch)
+            else:
+                self.touchCounter=0
+                self.longTouch=0
+            self.lastTouch=ms
+        else:
+                self.touchCounter=0
+                self.longTouch=0
+        if self.longTouch:
+                snapshot2(gd,"main")
+                #sys.exit("snap exit ")
+
         if tag == tag_cube_demo:
                 print("tag_cube_demo")
                 from cube.cube import cube 
@@ -107,7 +138,7 @@ class main_app():
                 print("Exception:",e)
                 #self.showException()
         elif tag == tag_audio_playback:
-            print("tag_audio_playback")
+            print("tag_audio_play")
             from audio_play.audio_play import audio_play             
             audio_play(eve)
         elif tag == tag_video_playback:
@@ -115,18 +146,19 @@ class main_app():
              import video2 as demo
              sdcard= "/sd/"
              demo.start(sdcard, eve)
-             time.sleep(0.5)
+             time.sleep(0.01)
 
     def loop(self):
         eve = self.eve
         eve.cmd_dlstart() 
         eve.ClearColorRGB(0, 0, 0) 
         eve.Clear(1, 1, 1)        
-        x = 20; y = 10
-        eve.cmd_text(x, y, 31, 0, "IDM2040 demo")
+        eve.cmd_text(self.x0, self.y0, 31, 0, "IDM2040 Demo")
         self.drawBtn()
         ev = self.get_event()
         try:
+#             if self.longTouch:
+#                 self.snapshot2("main")
             eve.Display()
             eve.cmd_swap() 
             eve.flush() 
@@ -135,7 +167,7 @@ class main_app():
             print("exceprion:",e)
         self.processEvent(ev)
         eve.Tag(0)
-        time.sleep(0.05)
+        time.sleep(0.01)
 
 if __name__ == '__main__':
     mainMenu=main_app()
