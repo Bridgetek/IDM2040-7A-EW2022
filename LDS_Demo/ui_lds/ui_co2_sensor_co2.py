@@ -72,10 +72,5 @@ class ui_co2_sensor_co2(ui_co2_sensor):
         x+=100
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
-        if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-        ms = time.monotonic_ns() / 1000_000
-        if ms - self.last_timeout < self.readingInterval: return
-        self.last_timeout =  time.monotonic_ns() / 1000_000
-        if self.readOne(self.LDSBus_Sensor.lds)>0:
-            self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.preNext()
            

@@ -51,7 +51,7 @@ class ui_co2_sensor_h(ui_co2_sensor):
             print("tag_ui_lds_data_text")
 
     def processOne(self,lds,x,y):
-        self.statitics_box(x = x, y=y, w = self.boxW*2, h = self.boxH*2, border=1,data=ui_co2_sensor.humidity_data,scale=2,tvalue=self.value_h,MaxMin=4)
+        self.statitics_box(x = x, y=y, w = self.boxW*2, h = self.boxH*2, border=1,data=ui_co2_sensor.humidity_data,scale=2,tvalue=self.value_h,MaxMin=2)
                  
     def draw(self):
         eve = self.eve
@@ -71,9 +71,4 @@ class ui_co2_sensor_h(ui_co2_sensor):
         x+=100
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
-        if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-        ms = time.monotonic_ns() / 1000_000
-        if ms - self.last_timeout < self.readingInterval: return
-        self.last_timeout =  time.monotonic_ns() / 1000_000
-        if self.readOne(self.LDSBus_Sensor.lds)>0:
-            self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.preNext()

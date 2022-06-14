@@ -128,9 +128,11 @@ class ui_relay(ui_config):
                     elif vv=='1':
                         self.layout.draw_asset4(tag_ui_lds_relay_ch2,"fanOn",x2,y1) 
                     eve.Tag(0)
-                elif name=='Current - CH 1' and lds['OBJ']=='49152': 
+                elif name=='Current - CH 1' and lds['OBJ']=='49152':
+                    if (float(vv)<0.06):vv="0.000"
                     eve.cmd_text(x3,y2, 31, 0, "%s A"%vv)
-                elif name=='Current - CH 2' and lds['OBJ']=='49152': 
+                elif name=='Current - CH 2' and lds['OBJ']=='49152':
+                    if (float(vv)<0.06):vv="0.000"
                     eve.cmd_text(x4,y2, 31, 0, "%s A"%vv)                     
 
                 

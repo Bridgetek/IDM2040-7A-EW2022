@@ -78,6 +78,9 @@ class ui_main():
         self.showScan()
         gc.collect()
         print("LDS ui_main mem_free",gc.mem_free() )
+        self.lastTouch=time.monotonic_ns() / 1000_000
+        self.touchCounter=0
+        self.longTouch=0 
         while 1:
             ev=self.loop()
             if (ev==tag_ui_back): break
@@ -102,7 +105,7 @@ class ui_main():
 
     def showScan(self):
         self.start()
-        self.draw(150,300,30,"Scaning Sensor...")
+        self.draw(50,300,30,"Scaning Sensor...")
         self.flush()
 
   
@@ -120,17 +123,68 @@ class ui_main():
         print("setActiveUI %s\n" %(name))
         if name=="scan" :self.ui_active = self.ui_lds_scan
         elif  name=="4in1" :self.ui_active = self.ui_4in1_sensor
+        
+    def snapshot2( self,title):
+        eve = self.eve
+        block=60   #  -- 96000
+        #block=480 # --- 768000
+        file="/sd/Snap565_"+title+"_"+str(block)+".raw"
+        total=480/block
+        #chunk_size=800*block*4  #RGBA
+        block_size=800*block*2  #RGB565
+        chunk_size=2048
+        print("total" ,file,total ,chunk_size)
+        with open(file, 'wb') as f:
+            address = eve.RAM_G+(1024-128)*1024
+            for i in range(0,total):
+                #print("snapshotOne" ,i,block*i ,block_size)
+                eve.cmd_snapshot2(eve.RGB565, address, 0, block*i, 800, block)  #RGB565
+                eve.finish()
+                readAdd=0
+                while readAdd<block_size:
+                    leftSize=block_size-readAdd
+                    if (leftSize)>chunk_size:
+                        buf=eve.read_mem(address+readAdd,chunk_size)
+                    else:
+                        buf=eve.read_mem(address+readAdd,leftSize)
+                    readAdd+=chunk_size
+                    if not buf:
+                        print("error snapshotOne" ,i,address)
+                        return -1
+                    f.write(buf)
+    #         print("f.tell=", f.tell())
+        print("snapshot2 finish",total*block_size)
+
+  
     def get_event(self):
         eve = self.eve
-        self.gesture.renew(eve)
+        touch=self.gesture.renew(eve)
+        if touch.isTouch:
+            ms = time.monotonic_ns() / 1000_000
+            #print("ms " ,ms,(ms - self.lastTouch),self.touchCounter)
+            if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 250):
+                self.touchCounter+=1
+                if self.touchCounter>5:
+                    self.touchCounter=0
+                    self.longTouch=1
+                    print("longTouch " ,self.longTouch)
+                    #self.snapshot2(self.ui_active.title)
+            else:
+                self.touchCounter=0
+                self.longTouch=0
+            self.lastTouch=ms
 
-        tag = self.gesture.get().tagPressed
-        tagReleased=self.gesture.get().tagReleased
+        tag = touch.tagPressed
+        tagReleased=touch.tagReleased
         #if ( tag>0 ): print("main tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed,)
         #if ( tagReleased>0 ): print("main tagReleased", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
 
         if tagReleased==0: return
         tag=tagReleased
+        
+        if tag>0:
+                self.touchCounter=0
+                self.longTouch=0
 
         self.ui_previous=self.ui_active.title
         #print("*ui_previous",self.ui_previous)  
@@ -139,7 +193,16 @@ class ui_main():
             self.showScan()
             self.ui_active = self.ui_lds_scan
             self.ui_lds_scan._rescan=True
-            print("tag_ui_lds_scan")
+            print("tag_ui_lds_scan", ui_4in1_sensor.temperature_sample_num)
+            #print("temperature_data>", ui_4in1_sensor.temperature_data)
+            ui_4in1_sensor.temperature_sample_num=0
+            ui_4in1_sensor.temperature_data=[[0, 0]] *ui_4in1_sensor.temperature_MAX_SAMPLE
+            ui_4in1_sensor.humidity_sample_num=0
+            ui_4in1_sensor.humidity_data=[[0, 0]] *ui_4in1_sensor.temperature_MAX_SAMPLE
+            ui_co2_sensor.temperature_sample_num=0
+            ui_co2_sensor.temperature_data=[[0, 0]] *ui_co2_sensor.temperature_MAX_SAMPLE
+            ui_co2_sensor.humidity_sample_num=0
+            ui_co2_sensor.humidity_data=[[0, 0]] *ui_co2_sensor.temperature_MAX_SAMPLE
         elif tag == tag_ui_back:
             self.ui_active = self.ui_lds_scan
             print("tag_back")

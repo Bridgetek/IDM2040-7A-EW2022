@@ -39,7 +39,9 @@ class ui_co2_sensor(ui_common):
         self.value_t=0 
         self.value_h=0     
         self.value_a=0
-        self.readingInterval=10000 # reading sensor interval
+        #self.readingInterval=10000 # reading sensor interval
+        self.readingInterval=2000 # reading sensor interval
+        self.failCounter=0
 
     last_push_humidity = 0
     def push_humidity(self, value):
@@ -139,14 +141,14 @@ class ui_co2_sensor(ui_common):
             if (self.useBlend==1):
                 self.blendBk(x=x,y=y,w=width,h = boxH, border=1 ,blend=1) 
                 self.eve.RestoreContext()
-            self.coordinateMarker(x,y,width,boxH,1,1,0,tvalue=self.value_t,MaxMin=4)
+            self.coordinateMarker(x,y,width,boxH,1,1,0,tvalue=self.value_t,MaxMin=2)  #4-->2
             self.eve.Tag(tag_ui_lds_co2_a)
             if (self.useBlend==1): self.eve.SaveContext() 
-            self.circle_box(x =x+xHalf, y=y, w = width, h = boxH, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=100, hwarning=900, value=self.value_a)
+            self.circle_box(x =x+xHalf, y=y, w = width, h = boxH, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=70, hwarning=900, value=self.value_a)
             if (self.useBlend==1):self.eve.RestoreContext()
             self.eve.Tag(tag_ui_lds_co2_h)
             if (self.useBlend==1): self.eve.SaveContext() 
-            self.statitics_box(x = x+xHalf, y=y+yHalf, w = width, h = boxH, border=1,data=ui_co2_sensor.humidity_data ,tvalue=self.value_h,MaxMin=4)
+            self.statitics_box(x = x+xHalf, y=y+yHalf, w = width, h = boxH, border=1,data=ui_co2_sensor.humidity_data ,tvalue=self.value_h,MaxMin=2)  #4-->2
             if (self.useBlend==1):self.eve.RestoreContext()
             self.eve.Tag(tag_ui_lds_co2_co2)
             self.circle_box(x =x, y=y+yHalf, w = width, h = boxH, border=1, title="CO2",unit="ppm", vmin=0, vmax=30000, lwarning=400, hwarning=27000, value=self.value_co2)
@@ -163,6 +165,7 @@ class ui_co2_sensor(ui_common):
        
             if self.LDSBus_Sensor.LDSBus_SDK_Process_LDSUID(ldsuid) >= 0:
                 ss=""
+                addCounter=2*(self.failCounter +1)
                 for said, sensor in enumerate(lds_json['SNS']):
                     sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
                     #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
@@ -172,13 +175,13 @@ class ui_co2_sensor(ui_common):
                         else: ss=ss+","+"%s:%5.2f %s "%(sensor['NAME'][0:1], float( sns_value['VALUE']), sensor['UNIT'][0:1])
                         if  sensor['NAME'][0:1]=='T' and ui_co2_sensor.data_gui==1:
                             self.value_t=float( sns_value['VALUE'])
-                            for i in range(5): self.push_temperature(self.value_t)                                
+                            for i in range(addCounter): self.push_temperature(self.value_t)                                
                         if  sensor['NAME'][0:1]=='A' and ui_co2_sensor.data_gui==1:
                             self.value_a=float( sns_value['VALUE'])
                         if  sensor['NAME'][0:1]=='H' and ui_co2_sensor.data_gui==1:
                             #print("Humdity", sns_value['VALUE'])
                             self.value_h=float( sns_value['VALUE'])
-                            for i in range(5): self.push_humidity(self.value_h)                               
+                            for i in range(addCounter): self.push_humidity(self.value_h)                               
                         if  sensor['NAME']=='CO2' and ui_co2_sensor.data_gui==1: #Motion
                             co2=float( sns_value['VALUE'])
                             if (co2!=0 ) and (co2!=self.value_co2):
@@ -199,6 +202,17 @@ class ui_co2_sensor(ui_common):
                 #print ("%20s : %s ,ldsuid=%d" %  ("CO2 SENSOR PROCESS", "FAILED" ,ldsuid),   time.time())
                 return -1
 
+    def preNext(self):
+        if self.firstTime:
+            self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
+        ms = time.monotonic_ns() / 1000_000
+        if ms - self.last_timeout < self.readingInterval: return
+        self.last_timeout =  time.monotonic_ns() / 1000_000      
+        if (self.readOne(self.LDSBus_Sensor.lds)<0) :
+            self.failCounter+=1
+            #print("error during reading sensor data",self.failCounter)
+        else:            
+            self.failCounter=0       
     def draw(self):
         eve = self.eve
         layout = self.layout
@@ -213,18 +227,13 @@ class ui_co2_sensor(ui_common):
         eve.cmd_button(x+len(self.title)*FONTSIZE, y, self.btn_w, self.btn_h, 31, 0, "Info")
         if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)        
         self.drawBtn()
-        self.event()
+        #self.event()
         ymargin = 50
         y +=  ymargin
         widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])      
         x+=50
         y+=20
-        self.processOne(self.LDSBus_Sensor.lds,x,y) 
-        if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-        ms = time.monotonic_ns() / 1000_000
-        if ms - self.last_timeout < self.readingInterval: return
-        
-        if (self.readOne(self.LDSBus_Sensor.lds)<0) : print("error during reading sensor data");
-        self.last_timeout =  time.monotonic_ns() / 1000_000       
-        if self.readOne(self.LDSBus_Sensor.lds)>0:self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.processOne(self.LDSBus_Sensor.lds,x,y)
+        self.preNext()
+ 
             

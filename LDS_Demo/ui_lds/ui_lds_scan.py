@@ -59,7 +59,18 @@ class ui_lds_scan(ui_config):
         eve.Tag(tag_ui_lds_scan)
         eve.cmd_button(x5, y, btn_w, btn_h, 31, 0, "Scan")
 
-
+    def showScan(self):
+        eve = self.eve
+        eve.cmd_dlstart()
+        eve.Clear(1, 1, 1)
+        eve.VertexFormat(2)
+        eve.ColorRGB(0, 0, 0)
+        eve.ColorRGB(255, 255, 255)
+        eve.cmd_text(50,300,30,0,"Scaning Sensor...")
+        eve.Display()
+        eve.cmd_swap()
+        eve.flush()
+        
     def draw(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)
@@ -78,6 +89,7 @@ class ui_lds_scan(ui_config):
         eve.ColorRGB(255, 255, 255)
         if self._rescan :
             self._rescan =False
+            self.showScan()
             self.LDSBus_Sensor.scanLDS()
         eve.ColorRGB(170, 85, 0)
         eve.cmd_text(x, y, 29, 0, "LDS Name")

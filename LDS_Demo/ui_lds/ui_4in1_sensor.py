@@ -43,9 +43,7 @@ class ui_4in1_sensor(ui_common):
         now = time.monotonic_ns()
         TIME_PATTERN= 1 #second
         if now - self.last_push_humidity < TIME_PATTERN *1e9:
-            #pass
             return
-
         self.last_push_humidity = now
 
         timestamp = time.monotonic_ns() / 1e9
@@ -70,7 +68,6 @@ class ui_4in1_sensor(ui_common):
         now = time.monotonic_ns()
         TIME_PATTERN= 1 #second
         if now - self.last_push_temperature < TIME_PATTERN *1e9:
-            #pass
             return
 
         self.last_push_temperature = now
@@ -88,7 +85,7 @@ class ui_4in1_sensor(ui_common):
             else:
                 ui_4in1_sensor.temperature_sample_num=1
                 ui_4in1_sensor.temperature_data=[data]
-
+            #print("ui_4in1_sensor.temperature_sample_num",ui_4in1_sensor.temperature_sample_num)
         except  Exception as e:
             print("exceprion:",e)
             print("len:%d humidity_sample_num %d"%(len(ui_4in1_sensor.temperature_data),ui_4in1_sensor.temperature_sample_num) )
@@ -143,7 +140,7 @@ class ui_4in1_sensor(ui_common):
             eve.RestoreContext()
         self.coordinateMarker(x,y,boxW,boxH,1,1,0,tvalue=self.value_t)            
         self.eve.Tag(tag_ui_lds_4in1_a)
-        self.circle_box(x =x+xHalf, y=y, w = boxW, h = boxH, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=100, hwarning=900, value=self.value_a)
+        self.circle_box(x =x+xHalf, y=y, w = boxW, h = boxH, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=70, hwarning=900, value=self.value_a)
         eve.BlendFunc(eve.SRC_ALPHA, eve.ONE_MINUS_SRC_ALPHA) #reset to  default 
 
         eve.Tag(tag_ui_lds_4in1_h)
@@ -213,14 +210,15 @@ class ui_4in1_sensor(ui_common):
         eve.cmd_button(x+len(self.title)*FONTSIZE, y, self.btn_w, self.btn_h, 31, 0, "Info")
         if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)        
         self.drawBtn()
-        self.event()
+        #self.event()
         ymargin = 50
         y +=  ymargin
         widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])      
         x+=50
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,eve,x,y) 
-        if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
+        if self.firstTime:
+            self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
         ms = time.monotonic_ns() / 1000_000
         if ms - self.last_timeout < self.readingInterval: return
         self.last_timeout =  time.monotonic_ns() / 1000_000

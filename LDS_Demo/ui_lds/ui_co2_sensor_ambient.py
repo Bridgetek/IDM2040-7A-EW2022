@@ -51,7 +51,7 @@ class ui_co2_sensor_ambient(ui_co2_sensor):
             print("tag_ui_lds_data_text")
         
     def processOne(self,lds,x,y):
-        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=100, hwarning=900, value=self.value_a,tsize=31,scale=2)
+        self.circle_box(x =x, y=y, w = 290*2, h = 180*2, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=70, hwarning=900, value=self.value_a,tsize=31,scale=2)
                  
     def draw(self):
         eve = self.eve
@@ -72,9 +72,4 @@ class ui_co2_sensor_ambient(ui_co2_sensor):
         x+=100
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
-        if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-        ms = time.monotonic_ns() / 1000_000
-        if ms - self.last_timeout < self.readingInterval: return
-        self.last_timeout =  time.monotonic_ns() / 1000_000
-        if self.readOne(self.LDSBus_Sensor.lds)>0:
-            self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.preNext()       

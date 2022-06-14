@@ -65,7 +65,7 @@ class ui_co2_sensor_t(ui_co2_sensor):
         if (self.useBlend==1):
             self.blendBk(x=x,y=y,w=boxW,h = boxH, border=1,scale=2,blend=1) 
             self.eve.RestoreContext()
-        self.coordinateMarker(x,y,2*boxW,2*boxH,0,2,0,tvalue=self.value_t,MaxMin=4) 
+        self.coordinateMarker(x,y,2*boxW,2*boxH,0,2,0,tvalue=self.value_t,MaxMin=2) 
 
     def draw(self):
         eve = self.eve
@@ -86,9 +86,4 @@ class ui_co2_sensor_t(ui_co2_sensor):
         x+=100
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,x,y) 
-        if self.firstTime:  self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
-        ms = time.monotonic_ns() / 1000_000
-        if ms - self.last_timeout < self.readingInterval: return
-        self.last_timeout =  time.monotonic_ns() / 1000_000
-        if self.readOne(self.LDSBus_Sensor.lds)>0:
-            self.last_timeout =  time.monotonic_ns() / 1000_000
+        self.preNext()

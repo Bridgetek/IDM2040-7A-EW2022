@@ -174,6 +174,8 @@ class ui_common(ui_config):
         _padding = 25
         _size = 14
         _ROTATE = 90
+        _paddingX=20
+        x=x+_paddingX
         r = (h - _padding * 2) / 2
 
         _x = x + r + (w -r*2) / 2
@@ -536,9 +538,20 @@ class ui_common(ui_config):
 
 
         eve.ColorRGB(255, 255, 255)
-        if scale==1:eve.cmd_text(x + 3, y + 3, 21, 0, "Temperature(Degree)")
-        else:eve.cmd_text(x + 3, y + 3, 28, 0, "Temperature(Degree)")
+        if scale==1:
+            eve.cmd_text(x + 3, y + 3, 21, 0, "Temperature(")
+            eve.Vertex2ii(x + 90, y + 3,17,248) #dot
+            eve.cmd_text(x + 95, y + 3, 21, 0, "C)")
+#             eve.cmd_setfont2(1,0,32)
+#             eve.cmd_text(x + 185, y + 3, 1, 0, "\x20")
+#             eve.cmd_text(x + 200, y + 3, 21, 0, "()")
+#             eve.Begin(eve.BITMAPS)
 
+        else:
+            eve.cmd_text(x + 3, y + 3, 28, 0, "Temperature(")
+            eve.Begin(eve.BITMAPS)
+            eve.Vertex2ii(x + 130, y + 3,17,248) #dot
+            eve.cmd_text(x + 135, y + 3, 28, 0, "C)")
 
         # Rows
         #row_offsetx = x + PADDING_X
@@ -592,8 +605,8 @@ class ui_common(ui_config):
             #print("row_len,i,_x",row_len,i,_x)
         if tvalue!=0:
             eve.ColorRGB(self._COLOR_GREEN[0],self._COLOR_GREEN[1],self._COLOR_GREEN[2])
-            if scale==1:eve.cmd_text(x +15+ w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
-            else:eve.cmd_text(x + w/2, y + 3, 28, 0, "%3.1f"%( tvalue) )
+            if scale==1:eve.cmd_text(x +5+ w/2, y + 3, 21, 0, "%3.1f"%( tvalue) )
+            else:eve.cmd_text(x + 5+w/2, y + 3, 28, 0, "%3.1f"%( tvalue) )
 
     def boxMotion(self,x,y,w,h,border,scale=1,blend=0,tvalue=0):
         eve = self.eve
@@ -712,7 +725,37 @@ class ui_common(ui_config):
         else:        eve.Vertex2f(x+PADDING_X+37, y+PADDING_X) 
         eve.End() 
 
-
+    def snapshot2( self,title):
+        eve = self.eve
+        block=60   #  -- 96000
+        #block=480 # --- 768000
+        file="/sd/Snap565_"+title+"_"+str(block)+".raw"
+        total=480/block
+        #chunk_size=800*block*4  #RGBA
+        block_size=800*block*2  #RGB565
+        chunk_size=2048
+        print("total" ,file,total ,block_size,chunk_size)
+        with open(file, 'wb') as f:
+            address = eve.RAM_G+(1024-256)*1024
+            for i in range(0,total):
+                #print("snapshotOne" ,i,block*i ,block_size)
+                eve.cmd_snapshot2(eve.RGB565, address, 0, block*i, 800, block)  #RGB565
+                eve.finish()
+                readAdd=0
+                while readAdd<block_size:
+                    leftSize=block_size-readAdd
+                    if (leftSize)>chunk_size:
+                        buf=eve.read_mem(address+readAdd,chunk_size)
+                    else:
+                        buf=eve.read_mem(address+readAdd,leftSize)
+                    readAdd+=chunk_size
+                    if not buf:
+                        print("error snapshotOne" ,i,address)
+                        return -1
+                    f.write(buf)
+    #         print("f.tell=", f.tell())
+        print("snapshot2 finish",total*block_size)
+        
     def drawBtn(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)
