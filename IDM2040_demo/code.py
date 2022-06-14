@@ -7,8 +7,6 @@ import sys
 import time
 import gc
 
-from main_menu.eve_tools import snapshot2
-
 from main_menu.brt_eve_rp2040_dmx import BrtEveRP2040_dmx as BrtEveRP2040
 
 if sys.implementation.name == "circuitpython":
@@ -94,25 +92,26 @@ class main_app():
     def processEvent(self,tag):
         eve = self.eve
         is_touch = eve.rd32(eve.REG_TOUCH_RAW_XY) != 0xFFFFFFFF
-        if is_touch:
-            ms = time.monotonic_ns() / 1000_000
-            #print("ms " ,ms,(ms - self.lastTouch))
-            if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
-                self.touchCounter+=1
-                if self.touchCounter>9:
-                    self.touchCounter=0
-                    self.longTouch=1
-                    print("longTouch " ,self.longTouch)
-            else:
-                self.touchCounter=0
-                self.longTouch=0
-            self.lastTouch=ms
-        else:
-                self.touchCounter=0
-                self.longTouch=0
-        if self.longTouch:
-                snapshot2(gd,"main")
-                #sys.exit("snap exit ")
+#         if is_touch:
+#             ms = time.monotonic_ns() / 1000_000
+#             #print("ms " ,ms,(ms - self.lastTouch))
+#             if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
+#                 self.touchCounter+=1
+#                 if self.touchCounter>9:
+#                     self.touchCounter=0
+#                     self.longTouch=1
+#                     print("longTouch " ,self.longTouch)
+#             else:
+#                 self.touchCounter=0
+#                 self.longTouch=0
+#             self.lastTouch=ms
+#         else:
+#                 self.touchCounter=0
+#                 self.longTouch=0
+#         if self.longTouch:
+#                 from main_menu.eve_tools import snapshot2
+#                 snapshot2(gd,"main")
+#                 sys.exit("snap exit ")
 
         if tag == tag_cube_demo:
                 print("tag_cube_demo")
@@ -171,7 +170,6 @@ class main_app():
 
 if __name__ == '__main__':
     mainMenu=main_app()
-    mainMenu.showFreeMem()
     try:
         while 1:
             mainMenu.loop()

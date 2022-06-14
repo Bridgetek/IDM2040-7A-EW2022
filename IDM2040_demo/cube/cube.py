@@ -13,10 +13,7 @@
 import math
 from brteve.brt_eve_bt817_8 import BrtEve
 from brteve.brt_eve_rp2040 import BrtEveRP2040
-from main_menu.eve_tools import snapshot2
 
-def test():
-    print("test fun")
     
 def startCube():
     print("startCube")
@@ -391,8 +388,6 @@ class cube:
             if tag == tag_Back:     
                   print("back")
                   break
-                
-            #eve.swap()
             try:
                 eve.Display()
                 eve.cmd_swap()  #Co-processor faulty
@@ -401,9 +396,10 @@ class cube:
             #except  CoprocessorException as e:
             except  Exception as e:
                 print("exceprion:",e)
-            if t==10:
-                snapshot2(eve,"cube")
-            t += 1
+#             if t==10:
+#                 from main_menu.eve_tools import snapshot2   
+#                 snapshot2(eve,"cube")
+#             t += 1
 
         eve.cmd_dlstart() #  cause problem
         eve.VertexFormat(2)

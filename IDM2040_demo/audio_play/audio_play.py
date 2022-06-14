@@ -5,7 +5,7 @@ from .tags import *
 from .helper_gesture import helper_gesture
 from .ui import ui
 from .audio_eve import audio_eve
-from main_menu.eve_tools import snapshot2
+
 import sys
 if sys.implementation.name == "circuitpython":
     from brteve.brt_eve_bt817_8 import BrtEve
@@ -116,25 +116,24 @@ class audio_play():
         eve = self.eve
         ges = self.helper_gesture.renew()
         tag = ges.tagReleased
-
-
-        if ges.isTouch:
-            ms = time.monotonic_ns() / 1000_000
-            if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
-                self.touchCounter+=1
-                if self.touchCounter>9:
-                    self.touchCounter=0
-                    self.longTouch=1
-            else:
-                self.touchCounter=0
-                self.longTouch=0
-            self.lastTouch=ms
-        else:
-                self.touchCounter=0
-                self.longTouch=0                       
-        if self.longTouch:
-                snapshot2(self.eve,"audio_"+str(self.snapCounter))
-                self.snapCounter+=1
+#         if ges.isTouch:
+#             ms = time.monotonic_ns() / 1000_000
+#             if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
+#                 self.touchCounter+=1
+#                 if self.touchCounter>9:
+#                     self.touchCounter=0
+#                     self.longTouch=1
+#             else:
+#                 self.touchCounter=0
+#                 self.longTouch=0
+#             self.lastTouch=ms
+#         else:
+#                 self.touchCounter=0
+#                 self.longTouch=0                       
+#         if self.longTouch:
+#                 from main_menu.eve_tools import snapshot2
+#                 snapshot2(self.eve,"audio_"+str(self.snapCounter))
+#                 self.snapCounter+=1
                 
         if tag == tag_play: # play/pause is same button
             # blocking function
@@ -296,31 +295,42 @@ class audio_play():
         elif self.random == 1:
             self.random = 0
         self.ui.set_random(self.random)
-        
+       
+    def angle_vol(self,angle):
+        self.vol = angle
+        self.vol =max(0, self.vol)
+        self.vol =min(255, self.vol)
+        self.ui.set_volume(self.vol)
+        self.audio_eve.set_volume(self.vol)        
     def set_volume(self):
         track = self.helper_gesture.get().tagTrackTouched
         tag = track & 0xFF
         angel = track >> 16
         if tag == tag_volume:
-            angel = round(angel * 360 / 65535)
+            angel = angel * 360 // 65535
+            #print("angel>",angel,self.last_angle_volume)
             
-            if self.last_angle_volume != 0 and angel != self.last_angle_volume:
-                diff = angel - self.last_angle_volume
-                if diff > 180: # decreasing, counter clock wise
-                    diff = diff - 360
-                elif diff < -180: # increasing, clock wise
-                    diff = diff + 360
-
-                if (self.vol < 255 and diff > 0) or (self.vol > 0 and diff < 0):
-                    self.vol += diff
-                    self.vol =max(0, self.vol)
-                    self.vol =min(255, self.vol)
-                    self.ui.set_volume(self.vol)
-                    self.audio_eve.set_volume(self.vol)
+#             if self.last_angle_volume != 0 and angel != self.last_angle_volume:
+#                 diff = angel - self.last_angle_volume
+#                 print("diff",diff)
+#                 if diff > 180: # decreasing, counter clock wise
+#                     diff = diff - 360
+#                 elif diff < -180: # increasing, clock wise
+#                     diff = diff + 360
+# 
+#                 if (self.vol < 255 and diff > 0) or (self.vol > 0 and diff < 0):
+#                     self.vol += diff
+#                     self.vol =max(0, self.vol)
+#                     self.vol =min(255, self.vol)
+#                     self.ui.set_volume(self.vol)
+#                     self.audio_eve.set_volume(self.vol)
             
+            if angel<45: angel=360
             self.last_angle_volume = angel
-        else:
-            self.last_angle_volume = 0
+            
+            self.angle_vol(angel-90)
+#         else:
+#             self.last_angle_volume = 0
         
     def jump_to(self, time):
         print("Function is not implemented")

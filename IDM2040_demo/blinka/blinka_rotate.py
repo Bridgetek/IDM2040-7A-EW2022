@@ -4,7 +4,7 @@ from brteve.brt_eve_common import f16, furmans
 from brteve.brt_eve_bt817_8 import BrtEve
 from brteve.brt_eve_rp2040 import BrtEveRP2040
 
-from main_menu.eve_tools import snapshot2
+
 
 class blinka_rotate(object):
     def __init__(self,eve: BrtEve):
@@ -131,9 +131,10 @@ class blinka_rotate(object):
                   break                         
             
             gd.swap()
-            if t==10:
-                snapshot2(gd,"blinka")
             t += 1
+#             if t==10:
+#                 from main_menu.eve_tools import snapshot2                
+#                 snapshot2(gd,"blinka")
         print("clear")
         eve=gd
         eve.cmd_dlstart()    

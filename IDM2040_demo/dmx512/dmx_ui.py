@@ -11,7 +11,6 @@ import array
 import ulab.numpy as np
 import board
 from .dmx512 import dmx512
-from main_menu.eve_tools import snapshot2
 
 tag_count=1
 tag_reset=tag_count;tag_count+=1
@@ -187,30 +186,29 @@ class dmx_ui(object):
         elif tagReleased==tag_white:
             self.writeOneFrame(self.rgb,self.tWhitePercent)
 
-        if touch.isTouch:
-            ms = time.monotonic_ns() / 1000_000
-            #print("ms " ,ms,(ms - self.lastTouch))
-            if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
-                self.touchCounter+=1
-                if self.touchCounter>9:
-                    self.touchCounter=0
-                    self.longTouch=1
-            else:
-                self.touchCounter=0
-                self.longTouch=0
-            self.lastTouch=ms
-        else:
-                self.touchCounter=0
-                self.longTouch=0            
-            
-        if self.longTouch:
-                snapshot2(self.eve,"dmx512_"+str(self.snapCounter))
-                self.snapCounter+=1
+#         if touch.isTouch:
+#             ms = time.monotonic_ns() / 1000_000
+#             #print("ms " ,ms,(ms - self.lastTouch),self.touchCounter)
+#             if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 200):
+#                 self.touchCounter+=1
+#                 if self.touchCounter>9:
+#                     self.touchCounter=0
+#                     self.longTouch=1
+#             else:
+#                 self.touchCounter=0
+#                 self.longTouch=0
+#             self.lastTouch=ms
+#         else:
+#                 self.touchCounter=0
+#                 self.longTouch=0                      
+#         if self.longTouch:
+#                 from main_menu.eve_tools import snapshot2
+#                 snapshot2(self.eve,"dmx512_"+str(self.snapCounter))
+#                 self.snapCounter+=1
             
         if not touch.isTouch:
             return 0
-  
-  
+    
         if tag == tag_Back:
             print("back")
             return -1
@@ -219,7 +217,7 @@ class dmx_ui(object):
             self.lightness=255*(vv/65535)
             #self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness) # it takes time
             self.tWhitePercent=0
-            print("lightness",self.lightness)
+            #print("lightness",self.lightness)
         elif tag == tag_white:
            vv=touch.tagTrackTouched>>16
            self.tWhitePercent=100*(vv/65535)
@@ -239,27 +237,21 @@ class dmx_ui(object):
             self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)
             self.tWhitePercent=0
             self.updateRGB()
-
         elif tag == tag_all_red:
             self.rgb=(255,0,0)
             self.writeOneFrame(self.rgb,self.tWhitePercent)
-
         elif tag == tag_all_green:
             self.rgb=(0,255,0)
             self.writeOneFrame(self.rgb,self.tWhitePercent)
-
         elif tag == tag_all_blue:
             self.rgb=(0,0,255)
             self.writeOneFrame(self.rgb,self.tWhitePercent)
-
         elif tag == tag_all_dark:
             print("tag_all_dark")
             self.rgb=(0,0,0)
             self.tWhitePercent=0
             self.writeOneFrame(self.rgb,self.tWhitePercent)
-
         return 0
-
  
     def loop(self):
         eve=self.eve
@@ -321,7 +313,7 @@ class dmx_ui(object):
             eve.cmd_text(x+350, y-20, 28, 0, "White LED lightness" )
             eve.TagMask(1)
             eve.Tag(tag_white)
-            eve.cmd_track(x+350, y+35, w, h, tag_white)
+            eve.cmd_track(x+350, y+35, w, h+20, tag_white)
             eve.cmd_slider(x+350, y+35, w, h, 0, self.tWhitePercent, 100)
 
             
@@ -331,7 +323,7 @@ class dmx_ui(object):
             eve.cmd_bgcolor(0xffffff)  
             eve.ColorRGB(0xff,0xff,0xff)
             eve.Tag(tag_lightness)
-            eve.cmd_track(x, y, w, h, tag_lightness)
+            eve.cmd_track(x, y-10, w, h+30, tag_lightness)   # h bigger get better
             eve.cmd_slider(x, y, w, h, 0, self.lightness, 255)    
         
             touch=touch_ges.renew()
