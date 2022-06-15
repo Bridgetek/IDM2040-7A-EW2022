@@ -206,11 +206,10 @@ class audio_play():
             44100, self.eve.LINEAR_SAMPLES);
 
     def play_pauseFromFlash(self):
-        print('play_pauseFromFlash'  )
+        #print('play_pauseFromFlash'  )
         self.ui.play(not self.audio_eve.is_playing())
         fname=self.files[self.file_selected_id]
-        print(fname)
-        print(self.wfiles[fname][0],self.wfiles[fname][1])    
+        print(fname,self.wfiles[fname][0],self.wfiles[fname][1])    
         self.file_size=self.wfiles[fname][1]       
         if not self.audio_eve.is_playing():
             self.ui.set_playing_file_id(self.file_selected_id)
@@ -220,20 +219,8 @@ class audio_play():
             # with open(self.media_location +'/'+ self.files[self.file_selected_id], "rb") as file_handler:
             #     file_handler.seek(0, SEEK_END)
             #     self.file_size = file_handler.tell()
-            #     file_handler.seek(0, SEEK_SET)
-
-        #self.ui.render()
-        # this is a blocking function, use callback function (fifo_interrupt) to check playback status
-        # self.audio_eve.play(self.fifo_interrupt, 
-        #     self.media_location +'/'+ self.files[self.file_selected_id],
-        #     44100, self.eve.LINEAR_SAMPLES);
-
-        # file_example_WAV_1MG.raw                                : 128576  : 268288   
-        #262K
+            #     file_handler.seek(0, SEEK_SET
         self.audio_eve.playfromFlash(self.fifo_interrupt,self.wfiles[fname][0],self.wfiles[fname][1],44100, self.eve.LINEAR_SAMPLES)
-        #self.audio_eve.playfromFlash(self.fifo_interrupt,396864,44100, self.eve.LINEAR_SAMPLES)
-
-
 
     def stop(self):
 
@@ -343,5 +330,4 @@ class audio_play():
     def fast_backward(self, file):
         print("Function is not implemented")
         pass
-
-        
+      

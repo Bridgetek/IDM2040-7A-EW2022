@@ -282,9 +282,10 @@ class audio_eve():
         eve.wr8(eve.REG_GPIOX_DIR,0xf0)
         eve.wr8(eve.REG_GPIOX,0xf0) 
 
-        self.eve.wr32(self.eve.REG_VOL_PB, 0)
-        eve.wr32(eve.REG_PLAYBACK_LOOP, 0);
-        eve.wr32(eve.REG_PLAYBACK_LENGTH, 0);
+        eve.wr32(self.eve.REG_VOL_PB, 0)
+        eve.wr32(eve.REG_PLAYBACK_LOOP, 0)
+        eve.wr32(eve.REG_PLAYBACK_LENGTH, 0)
+        eve.wr32(self.eve.REG_PLAYBACK_PAUSE, 0) #
         eve.cmd_memset(self.mediafifo_start, 0xFF, self.mediafifo_len)
         eve.Nop()
         eve.finish()
@@ -308,6 +309,4 @@ class audio_eve():
         print("Function is not implemented")
 
     def fast_backward(self):
-        print("Function is not implemented")
-
-        
+        print("Function is not implemented")    
