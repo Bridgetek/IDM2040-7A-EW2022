@@ -2,11 +2,7 @@ from main_menu.tags_all import *
 import microcontroller
 import watchdog
 import time
-
 import sys
-import time
-import gc
-
 from main_menu.brt_eve_rp2040_dmx import BrtEveRP2040_dmx as BrtEveRP2040
 
 if sys.implementation.name == "circuitpython":
@@ -74,16 +70,14 @@ class main_app():
         eve.cmd_button(x2, y3, btn_w, btn_h, 31, 0, "Video Playback")
   
     def showException(self):
-        self.eve.cmd_dlstart() #   
+        self.eve.cmd_dlstart()  
         self.eve.ColorRGB(255, 0, 0)  
         self.eve.cmd_text(520, 10, 30, 0, "Exception !")
         self.eve.Display()
-        self.eve.cmd_swap()  #Co-processor faulty
+        self.eve.cmd_swap()   
         self.eve.flush()
         time.sleep(2)
-    def showFreeMem(self):
-        gc.collect()
-        print("mem_free",gc.mem_free() )        
+      
     def get_event(self):
         eve = self.eve     
         tag = eve.rd32(eve.REG_TOUCH_TAG) & 0xFF       
@@ -92,40 +86,16 @@ class main_app():
     def processEvent(self,tag):
         eve = self.eve
         is_touch = eve.rd32(eve.REG_TOUCH_RAW_XY) != 0xFFFFFFFF
-#         if is_touch:
-#             ms = time.monotonic_ns() / 1000_000
-#             #print("ms " ,ms,(ms - self.lastTouch))
-#             if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
-#                 self.touchCounter+=1
-#                 if self.touchCounter>9:
-#                     self.touchCounter=0
-#                     self.longTouch=1
-#                     print("longTouch " ,self.longTouch)
-#             else:
-#                 self.touchCounter=0
-#                 self.longTouch=0
-#             self.lastTouch=ms
-#         else:
-#                 self.touchCounter=0
-#                 self.longTouch=0
-#         if self.longTouch:
-#                 from main_menu.eve_tools import snapshot2
-#                 snapshot2(gd,"main")
-#                 sys.exit("snap exit ")
-
         if tag == tag_cube_demo:
-                print("tag_cube_demo")
                 from cube.cube import cube 
                 cube(eve).loop()
         elif tag == tag_blinka_dema:
-                print("tag_blinka_dema")
                 from blinka.blinka_rotate import blinka_rotate  
                 blinka_rotate(eve).run()
         elif tag == tag_dmx512_demo:
             from  dmx512.dmx_ui import dmx_ui  
             dmx_ui(eve).loop()                  
         elif tag == tag_image_View:
-            print("tag_image_View")
             from image_viewer.image_viewer import image_viewer  
             spi1 = eve.spi_sdcard()
             eve.finish()
@@ -135,13 +105,10 @@ class main_app():
                 self.showFreeMem()
             except  Exception as e:
                 print("Exception:",e)
-                #self.showException()
         elif tag == tag_audio_playback:
-            print("tag_audio_play")
             from audio_play.audio_play import audio_play             
             audio_play(eve)
         elif tag == tag_video_playback:
-             print("tag_video_playback")
              import video2 as demo
              sdcard= "/sd/"
              demo.start(sdcard, eve)
@@ -156,14 +123,12 @@ class main_app():
         self.drawBtn()
         ev = self.get_event()
         try:
-#             if self.longTouch:
-#                 self.snapshot2("main")
             eve.Display()
             eve.cmd_swap() 
             eve.flush() 
             eve.cmd_loadidentity() 
         except  Exception as e:
-            print("exceprion:",e)
+            print("exception:",e)
         self.processEvent(ev)
         eve.Tag(0)
         time.sleep(0.01)

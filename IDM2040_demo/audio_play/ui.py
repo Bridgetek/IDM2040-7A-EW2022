@@ -1,6 +1,4 @@
 import time
-
-
 from .tags import *
 from .helper_gesture import helper_gesture
 from .helper_image import helper_image

@@ -3,7 +3,6 @@ import busio
 import digitalio
 import time
 from array import array
-import gc
 
 UART1_POL_PIN =board.GP16
 
@@ -26,20 +25,16 @@ class dmx512():
 
     #the special method __del__ is not implemented for user-defined classes.
     def __del__(self):
-        print("__del__ dmx512 ")
         self.dmx_uart.deinit()
         self.de_pin.deinit()
         self.uart1_pol_pin.deinit()
     def deinit(self):   
-        print("dmx512 deinit ")
         self.dmx_uart.deinit()
         self.de_pin.deinit()
         self.uart1_pol_pin.deinit()
         
     def set_messages(self, v):
-        self.dmx_message=v
-     
- 
+        self.dmx_message=v   
         
     def set_channels(self, message):
         """
@@ -139,12 +134,6 @@ def initIO():
     PIN_22 = DigitalInOut(board.GP22)  # digital write to ESP_D_R_PIN
     PIN_22.direction = Direction.INPUT
 
-#     PIN_LED = DigitalInOut(board.LED) 
-#     PIN_LED.direction = Direction.OUTPUT
-#     PIN_LED.value = True
-#     time.sleep(0.5)
-#     PIN_LED.value = False
-
     
 if __name__ == "__main__":
     initIO()
@@ -153,41 +142,30 @@ if __name__ == "__main__":
     led_pin = digitalio.DigitalInOut(board.GP25)
     led_pin.direction = digitalio.Direction.OUTPUT
     led_pin.value = 1
-    print("DMX test addrDMX",addrDMX)
-
+    #print("DMX test addrDMX",addrDMX)
     dmx = dmx512(channel,board.GP8)
-
      
     for i in range(1,6):
         print(i)
        
         if (i==2):
             dmx.setStart4ch(addrDMX,0,255,0,0)
-            print("Red-(check wire) ")
         elif (i==3):
             dmx.setStart4ch(addrDMX,0,0,255,0)
-            print("Blue-(check wire)")
         elif (i==4):
             dmx.setStart4ch(addrDMX,0,0,0,i*32)
-            print("white")
         elif  (i==1):
             dmx.setStart4ch(addrDMX,255,0,0,0)
-            print("Green-(check wire) ")
         else:
             dmx.setStart4ch(addrDMX,32,64,64,0)
-            print("dim ")
             
         dmx.write_frame() # re-write once
-        print("DMX On ")
         time.sleep(1)
         dmx.off(addrDMX)
         dmx.off(addrDMX)
-        print("DMX Off ")
         time.sleep(1)
         
     dmx.off(addrDMX)
     dmx.deinit()
     
-    del dmx
-    gc.collect()
-    print("exit DMX test ")
+

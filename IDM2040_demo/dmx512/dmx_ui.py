@@ -41,39 +41,11 @@ class dmx_ui(object):
         left = w/2 - 252/2
         self.images = {
                               #addr0           size1  w2  h3  tag4 scale5 x6                y7
-            'unified.blob'  : [0      - 4096 , 4096 , 0,  0,   0,  0,     0, 0],
-            'circle_72x72'  : [4096   - 4096 , 5184 , 72, 72,  0,  1,     0, 0],
-            'circle_140x140': [17792  - 4096 , 19648, 140,140, 0,  1,     0, 0],
-            'circle_92x92'  : [9280   - 4096 , 8512 , 92, 92,  0,  1,     0, 0],
-            'circle_92x92_1': [9280   - 4096 , 8512 , 92, 92,  0,  1,     left - 97         , h - 92      ],
-            'circle_92x92_2': [9280   - 4096 , 8512 , 92, 92,  0,  1,     left - 97 * 2     , h - 92      ],
-            'circle_92x92_3': [9280   - 4096 , 8512 , 92, 92,  0,  1,     left + 252 + 5    , h - 92      ],
-            'circle_92x92_4': [9280   - 4096 , 8512 , 92, 92,  0,  1,     left + 252 + 102  , h - 92      ],
-            'knob_252x252'  : [37440  - 4096 , 63552, 252,252, 0,  1,     left              , h - 252     ],
-            'loop1_72x72'   : [100992 - 4096 , 5184 , 72, 72,  0,  1,     left - 100        , h - 252 + 30],
-            'loopall_72x72' : [106176 - 4096 , 5184 , 72, 72,  0,  1,     left - 100        , h - 252 + 30],
-            'loopoff_72x72' : [111360 - 4096 , 5184 , 72, 72,  0,  1,     left - 100        , h - 252 + 30],
-            'mixoff_48x48'  : [116544 - 4096 , 2304 , 48, 48,  0,  1,     left + 252 + 52   , h - 252 + 30],
-            'mixon_48x48'   : [118848 - 4096 , 2304 , 48, 48,  0,  1,     left + 252 + 52   , h - 252 + 30],
-            'mute_48x48'    : [121152 - 4096 , 2304 , 48, 48,  0,  1,     left + 100        , h - 150     ],
-            'next_36x28'    : [123456 - 4096 , 1024 , 36, 28,  0,  1,     left - 97 + 25    , h - 60      ],
-            'prev_36x28'    : [126528 - 4096 , 1024 , 36, 28,  0,  1,     left - 97 * 2 + 23, h - 60      ],
-            'pause_36x28'   : [124480 - 4096 , 1024 , 36, 28,  0,  1,     left + 252 + 31   , h - 60      ],
-            'play_36x28'    : [125504 - 4096 , 1024 , 36, 28,  0,  1,     left + 252 + 31   , h - 60      ],
-            'stop_36x28'    : [127552 - 4096 , 1024 , 36, 28,  0,  1,     left + 252 + 128  , h - 60      ],
             'circular_colorwheel'    : [128576 - 4096 , 63552 , 252, 252,  0,  1,     100  , 50      ],
             #'gs-16b-2c-44100hz.raw'    : [144960 - 4096 , 699328 , 250, 250,  0,  1,     100  , 50      ],
         } 
-
-
-        count = 1
-        for img in self.images:
-            self.images[img][4] = count
-            count+=1
-            iamge=self.images[img]
             
         img = self.images['circular_colorwheel']
-        print(img)
         eve.cmd_flashread(img[0], img[0]+4096, img[1])  
         eve.finish()
 
@@ -83,7 +55,6 @@ class dmx_ui(object):
         self.sat=0.5
         self.hue=50
         self.lightness=128
-        #self.rgb=(128,128,128)
         self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)
         self.x0=100
         self.y0=90
@@ -91,23 +62,9 @@ class dmx_ui(object):
         self.message='please pick color'
         self.workMode='text'
         self.last_timeout =  time.monotonic_ns() / 1000_000
-        self.wInterval=100 # write to DMX   interval
- 
-
+        self.wInterval=100 # write to DMX   interval 
         self.c_w=0
         self.counter=0
-        values = [
-            # rgb, hsv
-            ((0.0, 0.0, 0.0), (  0  , 0.0, 0.0)), # black
-            ((0.0, 0.0, 1.0), (4./6., 1.0, 1.0)), # blue
-            ((0.0, 1.0, 0.0), (2./6., 1.0, 1.0)), # green
-            ((0.0, 1.0, 1.0), (3./6., 1.0, 1.0)), # cyan
-            ((1.0, 0.0, 0.0), (  0  , 1.0, 1.0)), # red
-            ((1.0, 0.0, 1.0), (5./6., 1.0, 1.0)), # purple
-            ((1.0, 1.0, 0.0), (1./6., 1.0, 1.0)), # yellow
-            ((1.0, 1.0, 1.0), (  0  , 0.0, 1.0)), # white
-            ((0.5, 0.5, 0.5), (  0  , 0.0, 0.5)), # grey
-        ]
         self.lastTouch=time.monotonic_ns() / 1000_000
         self.touchCounter=0
         self.longTouch=0
@@ -167,9 +124,7 @@ class dmx_ui(object):
         return angleInDegree
 
     def updateRGB(self):
-            #print("rgb:",self.sat,self.hue,self.rgb)
             if self.sat>1:
-                 print("invalid :",self.sat,self.hue,self.rgb)
                  return 
             self.message="sat:%5.3f,hue:%d,rgb:%x %x %x"%(self.sat,self.hue,self.rgb[0],self.rgb[1],self.rgb[2])
             #print(self.message)
@@ -182,40 +137,19 @@ class dmx_ui(object):
         if tagReleased==tag_lightness:
             self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)  
             self.updateRGB()
-            print("release lightness",self.lightness)
+            #print("release lightness",self.lightness)
         elif tagReleased==tag_white:
             self.writeOneFrame(self.rgb,self.tWhitePercent)
 
-#         if touch.isTouch:
-#             ms = time.monotonic_ns() / 1000_000
-#             #print("ms " ,ms,(ms - self.lastTouch),self.touchCounter)
-#             if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 200):
-#                 self.touchCounter+=1
-#                 if self.touchCounter>9:
-#                     self.touchCounter=0
-#                     self.longTouch=1
-#             else:
-#                 self.touchCounter=0
-#                 self.longTouch=0
-#             self.lastTouch=ms
-#         else:
-#                 self.touchCounter=0
-#                 self.longTouch=0                      
-#         if self.longTouch:
-#                 from main_menu.eve_tools import snapshot2
-#                 snapshot2(self.eve,"dmx512_"+str(self.snapCounter))
-#                 self.snapCounter+=1
             
         if not touch.isTouch:
             return 0
     
         if tag == tag_Back:
-            print("back")
             return -1
         elif tag == tag_lightness:
             vv=touch.tagTrackTouched>>16
             self.lightness=255*(vv/65535)
-            #self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness) # it takes time
             self.tWhitePercent=0
             #print("lightness",self.lightness)
         elif tag == tag_white:
@@ -237,26 +171,12 @@ class dmx_ui(object):
             self.rgb=self.hsv_to_rgb(self.hue/360.0,self.sat,self.lightness)
             self.tWhitePercent=0
             self.updateRGB()
-        elif tag == tag_all_red:
-            self.rgb=(255,0,0)
-            self.writeOneFrame(self.rgb,self.tWhitePercent)
-        elif tag == tag_all_green:
-            self.rgb=(0,255,0)
-            self.writeOneFrame(self.rgb,self.tWhitePercent)
-        elif tag == tag_all_blue:
-            self.rgb=(0,0,255)
-            self.writeOneFrame(self.rgb,self.tWhitePercent)
-        elif tag == tag_all_dark:
-            print("tag_all_dark")
-            self.rgb=(0,0,0)
-            self.tWhitePercent=0
-            self.writeOneFrame(self.rgb,self.tWhitePercent)
+ 
         return 0
  
     def loop(self):
         eve=self.eve
         assetdir = "dmx512/"
-        t=1
         self.dmx.off(self.addrDMX)
         self.dmx.off(self.addrDMX)
         
@@ -280,16 +200,7 @@ class dmx_ui(object):
             x=self.x0; y=self.y0
             w=300
             h=320
-            
-#             eve.Tag(tag_all_red)
-#             eve.cmd_button(50, 400, 130,35,31, 0, "RED")
-#             eve.Tag(tag_all_green)
-#             eve.cmd_button(200, 400, 130,35,31, 0, "GREEN")
-#             eve.Tag(tag_all_blue)
-#             eve.cmd_button(350, 400, 130,35,31, 0, "BLUE")         
-#             eve.Tag(tag_all_dark)
-#             eve.cmd_button(500, 400, 130,35,31, 0, "DARK")
-            
+                        
             eve.Tag(tag_colorpicker)                        
             img = self.images['circular_colorwheel']
             eve.cmd_setbitmap(img[0], eve.ASTC_4x4, 2*self.radius, 2*self.radius)
@@ -304,7 +215,6 @@ class dmx_ui(object):
             eve.Vertex2f(x+350, y+100)
             eve.Vertex2f(x +350+w, y+h)
             
-            #eve.cmd_text(x +350, y+h+30, 28, 0, self.message)
             
             h=25
             eve.cmd_fgcolor(0xffffff)
@@ -337,9 +247,6 @@ class dmx_ui(object):
                 self.last_timeout =  ms
                 self.updateRGB()       
             time.sleep(0.0001)
-            t+=1
-            #print(t)
-        print("clear")
         self.rgb=(0,0,0)
         self.tWhitePercent=0
         self.writeOneFrame(self.rgb,self.tWhitePercent)
@@ -348,14 +255,13 @@ class dmx_ui(object):
         eve.ClearColorRGB(0, 0, 0)   
         eve.Clear(1, 1, 1) 
         eve.ColorRGB(0xff, 0xff, 0xff)
-        eve.cmd_fgcolor(0x003870)  # default
-        eve.cmd_bgcolor(0x002040)  # 
+        eve.cmd_fgcolor(0x003870)  
+        eve.cmd_bgcolor(0x002040) 
         eve.Display()
         eve.cmd_swap()   
         eve.flush() 
         self.dmx.deinit()
         del self.dmx 
-        print("exit")
 
 
 if __name__ == '__main__':

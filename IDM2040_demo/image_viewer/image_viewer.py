@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-#import asyncio
 sys.path.append("lib/adafruit")
 sys.path.append("lib/adafruit/adafruit_apds9960")
 
@@ -96,7 +95,6 @@ class image_viewer:
 
         demo=ui_jpeg(eve)
         demo.set_images(images, names)
-        print("will init apds9960 ")
         apds=self.init_APDS9960()
         pulsein, decoder=self.init_IR()
         use_touch=True
@@ -104,13 +102,9 @@ class image_viewer:
         #touch_ges = gesture()
         tag_Back=1
         t = 0
-        print("ready to loop ")
         while True:
-            #await asyncio.sleep(0.01) 
             ges = self.get_left_right(apds, pulsein, decoder)
             if use_touch:touch=touch_ges.renew()
- 
-            #print("gese ",ges,touch_ges.sIsSwipe,touch.isTouch)
  
             if use_touch:
                 if ges == 'left' or touch_ges.sIsSwipe == touch_ges.SWIPE_LEFT:
@@ -130,35 +124,17 @@ class image_viewer:
                 elif ges == 'down' :
                      print("back")
                      break
-#             if t==10:
-#                 from main_menu.eve_tools import snapshot2
-#                 snapshot2(eve,"imageviewer")
-#             t += 1
 
-
-                #eve.cmd_dlstart() #  cause problem
-                
-#             eve.TagMask(1)
-#             eve.Tag(tag_Back)
-# 
-#             tag = eve.rd32(eve.REG_TOUCH_TAG) & 0xFF
-#             if tag >0:
-#                   print("back")
-#                   break
-        print("Clear image Viewer")
         eve.cmd_dlstart()
         eve.VertexFormat(2)
-        eve.ClearColorRGB(0, 0, 0)   # 255-> 1   ,new black color
+        eve.ClearColorRGB(0, 0, 0)  
         eve.Clear(1, 1, 1) 
         eve.ColorRGB(0xff, 0xff, 0xff)
-        eve.cmd_fgcolor(0x003870)  # default
-        eve.cmd_bgcolor(0x002040)  # 
+        eve.cmd_fgcolor(0x003870)  
+        eve.cmd_bgcolor(0x002040)   
         eve.Display()
         eve.cmd_swap()   
         eve.flush() 
-        print("Exit  image Viewer")
-
-
             
 
     def init_APDS9960(self):
@@ -174,8 +150,6 @@ class image_viewer:
         return apds
 
     def init_IR(self):
-        #return None, None        
-        print("init_IR")   
         try:
             self.pulsein = pulseio.PulseIn(board.GP1, maxlen=512, idle_state=True)
             #pulsein = pulseio.PulseIn(board.GP26, maxlen=512, idle_state=True)

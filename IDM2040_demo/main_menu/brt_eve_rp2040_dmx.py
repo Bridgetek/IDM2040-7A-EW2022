@@ -90,8 +90,7 @@ class BrtEveRP2040_dmx():
 
     def write_ili9488(self,cmd,data):
         """ Write command and data to ili9488 LCD"""
-        self.write_ili9488_cmd(cmd)
-        self.write_ili9488_data(data)
+
 
     @spilock
     def write_ili9488_cmd(self, cmd):

@@ -7,7 +7,6 @@ import sdcardio # pylint: disable=import-error
 import storage # pylint: disable=import-error
 
 def snapshot2( eve,title):
-    return  #nothing to do")
     block=60   #  -- 96000
     #block=480 # --- 768000
     file="/sd/Snap565_"+title+"_"+str(block)+".raw"

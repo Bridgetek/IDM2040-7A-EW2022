@@ -13,14 +13,7 @@
 import math
 from brteve.brt_eve_bt817_8 import BrtEve
 from brteve.brt_eve_rp2040 import BrtEveRP2040
-
     
-def startCube():
-    print("startCube")
-
-    eve=eve
-    cube().cube_main()
-
 # this function is needed because self.rotate() function requires a normalized vector for
 #   the axis of rotation in x,y,z
 def normalize(vector):
@@ -327,10 +320,8 @@ class cube:
     def loop(self):
         eve=self.eve
         eve.cmd_dlstart()
- 
         eve.cmd_loadimage(0, 0)
         eve.load(open("cube/healsky3.jpg", "rb"))
-        print("width = {0}, height = {1}".format(eve.lcd_width, eve.lcd_height))
         eve.BitmapHandle(0)
         eve.BitmapSize(eve.NEAREST, eve.BORDER, eve.BORDER, eve.lcd_width, eve.lcd_height)
         self.eve.cmd_swap() 
@@ -342,8 +333,6 @@ class cube:
 
         tag_count=1
         tag_Back=tag_count;tag_count+=1
-        print("ready to loop/tag")
-        t = 0
         while 1:
             eve.cmd_dlstart()
             eve.VertexFormat(2) # cube can't be displayed without that one
@@ -363,7 +352,6 @@ class cube:
         
             cx = eve.lcd_width // 2
             cy = eve.lcd_height // 2
-            #print("cx",cx,cy)
             rrx = 16
             rry = 16
 
@@ -375,7 +363,6 @@ class cube:
             if rrx < 0 or rry < 0:
                 rot_angle = -0.1
 
-            #eve.Clear()
             norm_rot, magnitude = normalize([rx, ry, rz])
             if magnitude != 0:
                 self.rotation(rot_angle, norm_rot)
@@ -393,45 +380,31 @@ class cube:
                 eve.cmd_swap()  #Co-processor faulty
                 eve.flush() 
                 eve.cmd_loadidentity() 
-            #except  CoprocessorException as e:
             except  Exception as e:
                 print("exceprion:",e)
-#             if t==10:
-#                 from main_menu.eve_tools import snapshot2   
-#                 snapshot2(eve,"cube")
-#             t += 1
 
-        eve.cmd_dlstart() #  cause problem
+        eve.cmd_dlstart()  
         eve.VertexFormat(2)
-        eve.ClearColorRGB(0, 0, 0)   # 255-> 1   ,new black color
+        eve.ClearColorRGB(0, 0, 0)    
         eve.Clear(1, 1, 1) 
         eve.ColorRGB(0xff, 0xff, 0xff)
-        eve.cmd_fgcolor(0x003870)  # default
-        eve.cmd_bgcolor(0x002040)  # 
+        eve.cmd_fgcolor(0x003870)   
+        eve.cmd_bgcolor(0x002040)   
         eve.Display()
         eve.cmd_swap()   
         eve.flush() 
-
-
-        print("exited")
-
-
  
-print("__name__ ", __name__)
 if __name__ == "__main__":
-    print("as main")
     host = BrtEveRP2040()
     eve = BrtEve(host)
     #eve.init(resolution="1280x800", touch="goodix")
     eve.init(resolution="800x480", touch="capacity")
-
     cube(eve).loop()
 else:
-    print("as module")
     # host = BrtEveRP2040()
     # eve = BrtEve(host)
     # #eve.init(resolution="1280x800", touch="goodix")
     # eve.init(resolution="800x480", touch="capacity")
     # cube().cube_main()
-    # startCube(eve)
+ 
   

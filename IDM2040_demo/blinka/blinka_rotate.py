@@ -4,8 +4,6 @@ from brteve.brt_eve_common import f16, furmans
 from brteve.brt_eve_bt817_8 import BrtEve
 from brteve.brt_eve_rp2040 import BrtEveRP2040
 
-
-
 class blinka_rotate(object):
     def __init__(self,eve: BrtEve):
         self.eve=eve
@@ -64,8 +62,6 @@ class blinka_rotate(object):
         gd.BitmapHandle(0)
         gd.cmd_loadimage(2000, 0)
         gd.load(open(assetdir + "blinka540.png", "rb"))
-        # gd.BitmapSize(gd.BILINEAR, gd.BORDER, gd.BORDER, 540, 540)
-
         gd.BitmapHandle(1)
         gd.cmd_loadimage(-1, 0)
         gd.load(open(assetdir + "circuitpython.png", "rb"))
@@ -88,19 +84,11 @@ class blinka_rotate(object):
                 x = scale * r * math.sin(th)
                 y = scale * r * math.cos(th)
                 gd.Vertex2f(x, y)
-        
-        t = 0
         while True:
-            #gd.cmd_dlstart()  
             gd.VertexFormat(2)
-
-            # Bluish background glow
-            gd.ColorRGB(0x40, 0x50, 0x70)
-            
+            gd.ColorRGB(0x40, 0x50, 0x70)           
             self.draw_circular()
-
             gd.Begin(gd.BITMAPS)
-
             gd.SaveContext()        # {
             gd.BitmapHandle(0)      # blinka540.png
 
@@ -123,19 +111,11 @@ class blinka_rotate(object):
             gd.Vertex2f((gd.lcd_width - 364) / 2, (gd.lcd_height - 395) / 2)
 
             gd.Tag(tag_Back)
-            gd.cmd_button(700, 5, 85,35,30, 0, "Back")
-            
+            gd.cmd_button(700, 5, 85,35,30, 0, "Back")            
             tag = gd.rd32(gd.REG_TOUCH_TAG) & 0xFF
             if tag == tag_Back:     
-                  print("back" ,t)
                   break                         
-            
             gd.swap()
-            t += 1
-#             if t==10:
-#                 from main_menu.eve_tools import snapshot2                
-#                 snapshot2(gd,"blinka")
-        print("clear")
         eve=gd
         eve.cmd_dlstart()    
         eve.VertexFormat(2)
@@ -148,7 +128,6 @@ class blinka_rotate(object):
         eve.cmd_swap()   
         eve.flush() 
 
-        print("exit")
 if __name__ == '__main__':
     host = BrtEveRP2040()
     eve = BrtEve(host)
