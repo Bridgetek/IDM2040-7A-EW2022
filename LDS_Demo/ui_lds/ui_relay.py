@@ -25,7 +25,6 @@ class ui_relay(ui_config):
         self.gesture = gesture
         self.layout = layout
         self.LDSBus_Sensor = LDSBus_Sensor
-        #self.ui_main = ui_main
         self.title="LDSBus 2Ch Relay"
         self.ldsuid=-1
         self.lds_json=None
@@ -57,9 +56,7 @@ class ui_relay(ui_config):
         eve = self.eve
         layout = self.layout
         ges = self.gesture
-
         tag = ges.get().tagReleased
-        if ( tag>0 ): print("Relay tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
         if tag == tag_ui_lds_reset_data:
            self._histroy=[]
         elif tag == tag_ui_lds_relay_ch1:
@@ -71,26 +68,18 @@ class ui_relay(ui_config):
                     data = b'\x01' if self.relay_state[said] == True else b'\x00'
                     self.relay_state[said] = not self.relay_state[said]
                     self.LDSBus_Sensor.LDSBus_SDK_WriteValue(self.ldsuid, sensor,  data)
-                    #self.LDSBus_Sensor.lds_bus.LDSBus_SDK_WriteValue(self.ldsuid, int(sensor['SAID']), int(sensor['CLS']), data, len(data))
                     time.sleep(0.1)
                     sns_value = self.LDSBus_Sensor.LDSBus_SDK_ReadValue(self.ldsuid,sensor)
-                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(self.ldsuid, int(sensor['SAID']), int(sensor['CLS']))
-                    if sns_value is not None:
-                        print ("%20s : %-8s %s" %  (sensor['NAME'],  sns_value['VALUE'], sensor['UNIT']))
         elif tag == tag_ui_lds_relay_ch2:
           if self.lds_json is not None:
             #print ("=============ALTERNATE RELAYS STATES================")
             for said, sensor in enumerate(self.lds_json['SNS']):
-                #print ("%20s :type:%s %d" %  (sensor['NAME'],  sensor['TYPE'],int(sensor['SAID'])) )
                 if sensor['TYPE'] == 'OUTPUT' and sensor['NAME']=='Relay - CH 2':
                     data = b'\x01' if self.relay_state[said] == True else b'\x00'
                     self.relay_state[said] = not self.relay_state[said]
                     self.LDSBus_Sensor.LDSBus_SDK_WriteValue(self.ldsuid, sensor,  data)
                     time.sleep(0.1)
                     sns_value = self.LDSBus_Sensor.LDSBus_SDK_ReadValue(self.ldsuid,sensor)
-                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(self.ldsuid, int(sensor['SAID']), int(sensor['CLS']))
-                    if sns_value is not None:
-                        print ("%20s : %-8s %s" %  (sensor['NAME'],  sns_value['VALUE'], sensor['UNIT']))
 
 
     def draw_img(self, img_id, tag , x ,y,formatW=None):
@@ -142,7 +131,6 @@ class ui_relay(ui_config):
         counter=0
         error=1
         if self.firstTime:  
-            #self.firstTime=False;
             print("ldsuid:",ldsuid, "OBJ:",lds['OBJ'] ," lds:",lds)
         self.ldsuid=ldsuid
         lds_object_file = self.LDSBus_Sensor.json_path + "/" + lds['OBJ'] + ".json"
@@ -157,13 +145,12 @@ class ui_relay(ui_config):
                 for said, sensor in enumerate(lds_json['SNS']):
                     time.sleep(0.002)
                     sns_value = self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
-                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
                     if self.firstTime:print ("DID=%d %20s :type:%s %s "%  (ldsuid,sensor['NAME'],  sensor['TYPE'],sns_value) )
                     if sns_value is not None:
                         vv=sns_value['VALUE']
                         if self.relayStatus[sensor['NAME']] != vv:
                             self.relayStatus[sensor['NAME']]=vv
-                            print("%s changed  %s" % (sensor['NAME'],self.relayStatus[sensor['NAME']] ))
+                            #print("%s changed  %s" % (sensor['NAME'],self.relayStatus[sensor['NAME']] ))
                         counter+=1
             else:rcode=-1
 #            if counter<4:print ("Error when reading Relay Data:%d"%  ( counter) )

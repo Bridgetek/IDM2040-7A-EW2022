@@ -1,6 +1,5 @@
 import time
 import math
-#import random
 from random import randint
 import json
 from .helper import helper
@@ -12,8 +11,6 @@ from .ui_common import ui_common
 from .ui_4in1_sensor import ui_4in1_sensor
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -26,33 +23,12 @@ class ui_4in1_sensor_t(ui_4in1_sensor):
     
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
         super().__init__(eve , helper, gesture, layout,LDSBus_Sensor)
-        #self.ui_main = ui_main
-        self.title="LDSBus 4in1 Sensor(Temperature)"
-        
+        self.title="LDSBus 4in1 Sensor(Temperature)"        
         self.useBlend=1
 
     def interrupt(self):
         return 0
 
-    def event(self):
-        eve = self.eve
-        layout = self.layout
-        ges = self.gesture
-
-        tag = ges.get().tagReleased
-        if ( tag>0 ): print("4in1 tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
-        if tag == tag_ui_lds_reset_data:
-           self._histroy=[]
-           self.humidity_data=[[0, 0]] * self.HUMIDITY_MAX_SAMPLE
-           self.humidity_sample_num = 0
-           self.temperature_data=[[0, 0]] * self.temperature_MAX_SAMPLE
-           self.temperature_sample_num = 0
-        elif tag == tag_ui_lds_data_gui:     
-            ui_4in1_sensor.data_gui=1
-            print("tag_ui_lds_data_gui")
-        elif tag == tag_ui_lds_data_text:     
-            ui_4in1_sensor.data_gui=0
-            print("tag_ui_lds_data_text")
 
     def boxE(self, x, y, w, h, border=1):
         e = self.eve
@@ -73,7 +49,7 @@ class ui_4in1_sensor_t(ui_4in1_sensor):
             self.eve.RestoreContext()
         self.coordinateMarker(x,y,2*boxW,2*boxH,0,2,0 ,tvalue=self.value_t)
         PADDING_X=30
-        #self.boxE(x+PADDING_X+1, y+1, boxW*2-PADDING_X-2,boxH*2-PADDING_X-2)
+
                         
                  
     def draw(self):

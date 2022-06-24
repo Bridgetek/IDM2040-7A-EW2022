@@ -28,11 +28,8 @@ class ui_common(ui_config):
         self.gesture = gesture
         self.layout = layout
         self.LDSBus_Sensor = LDSBus_Sensor
-        #self.ui_main = ui_main
         self.title=""
         self._clearData=True
-        self._histroy=[]
-        self._maxLen=10
 
         self.start_time_ns = 0
         self.hh=0

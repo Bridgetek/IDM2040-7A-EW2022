@@ -7,8 +7,6 @@ from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_config import ui_config
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -30,29 +28,18 @@ class ui_lds_scan(ui_config):
         self._rescan=True
         #self._rescan=False
  
-
-    def event(self):
-        eve = self.eve
-        ges = self.gesture
-        tag = ges.get().tagReleased
-        self.tagReleased=self.gesture.get().tagReleased
-        if ( tag>0 ): print("lds_scan tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed ,self.tagReleased)
-
- 
     def interrupt(self):
         return 0
 
     def drawBtn(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)
-
         y = self.layout.APP_Y 
         btn_w = self.btn_w
         btn_h = self.btn_h
         x1 = self.xStart
         x5 = x1 + 310
         x4 = x1 + 210
-        #print("drawBtn",x5,y,btn_w,btn_h)
         if (self.exit==1):
             eve.Tag(tag_ui_back)
             eve.cmd_button(x4, y, btn_w, btn_h, 31, 0, "Back")
@@ -78,10 +65,8 @@ class ui_lds_scan(ui_config):
         y = self.y0
         FONTSIZE = 16
         eve.cmd_text(x, y, 30, 0, self.title)
-        if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)
-        
-        self.drawBtn()
-        #self.event()        
+        if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)       
+        self.drawBtn() 
         eve.Tag(0)  
         ymargin = 70
         y +=  ymargin       
@@ -106,24 +91,15 @@ class ui_lds_scan(ui_config):
             if (i %2)==0: eve.ColorRGB(170, 85, 0)
             esle:eve.ColorRGB(85, 85, 0)
             eve.ColorRGB(255, 255, 255)
-#         for index, lds_a in self.LDSBus_Sensor.lds_list_all.items():
-#  
-#             eve.ColorRGB(255, 255, 255)
-#             did=lds_a['DID']
-#             lds=self.LDSBus_Sensor.lds_list.get(int(did) )
-#             #lds=self.LDSBus_Sensor.lds_list[int(did)]
             enableBut=True
             if (lds is  None):
                 lds=lds_a
                 enableBut=False
-                eve.ColorRGB(100,100, 100)
-                #print("offline",did)                                
+                eve.ColorRGB(100,100, 100)                             
             eve.cmd_text(x, y, 28, 0, lds['NAME'])
             eve.cmd_text(x+310, y, 28, 0, lds['DID'])
-            #eve.cmd_text(x+370, y, 28, 0, lds['UID'])
             if (enableBut): eve.Tag(tag_ui_lds_data_0+i) # start from 1
             eve.cmd_button(x+370, y, 250,30,28, 0, lds['UID'])
-            #eve.TagMask(0)
             eve.Tag(0) # start from 1
             eve.cmd_text(x+640, y, 28, 0, lds['MFG'])
             y+=distance

@@ -21,7 +21,6 @@ from .ui_co2_sensor_co2 import ui_co2_sensor_co2
 from .ui_relay import ui_relay
 from .ui_lds_Details import ui_lds_Details
 from .LDSBus_Sensor import LDSBus_Sensor
-import gc
 
 if sys.implementation.name == "circuitpython":
     from brteve.brt_eve_bt817_8 import BrtEve
@@ -54,9 +53,6 @@ class ui_main():
         self.ui_lds_Details=ui_lds_Details(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
         
         self.ui_active = self.ui_lds_scan
-        self.ui_previous=""
-        self.count_3touch = 0
-        self.last_x = 0
         self.currType=''
 
         self.hBk512=4
@@ -65,7 +61,6 @@ class ui_main():
         assetdir = "ui_lds/"
         eve.cmd_dlstart()  
         bmAdd=1024*750
-        print("hBk512 bmAdd",bmAdd)
         eve.BitmapHandle(self.hBk512)
         eve.cmd_loadimage(bmAdd, 0)
         eve.load(open(assetdir + "graph512.png", "rb"))
@@ -76,8 +71,7 @@ class ui_main():
         self.flush()
         time.sleep(0.2)
         self.showScan()
-        gc.collect()
-        print("LDS ui_main mem_free",gc.mem_free() )
+
         self.lastTouch=time.monotonic_ns() / 1000_000
         self.touchCounter=0
         self.longTouch=0 
@@ -120,7 +114,7 @@ class ui_main():
             i=i+1
         return self.currType ,currLDS
     def setActiveUI(self, name):
-        print("setActiveUI %s\n" %(name))
+        #print("setActiveUI %s\n" %(name))
         if name=="scan" :self.ui_active = self.ui_lds_scan
         elif  name=="4in1" :self.ui_active = self.ui_4in1_sensor
         
@@ -152,7 +146,6 @@ class ui_main():
                         print("error snapshotOne" ,i,address)
                         return -1
                     f.write(buf)
-    #         print("f.tell=", f.tell())
         print("snapshot2 finish",total*block_size)
 
   
@@ -176,8 +169,6 @@ class ui_main():
 
         tag = touch.tagPressed
         tagReleased=touch.tagReleased
-        #if ( tag>0 ): print("main tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed,)
-        #if ( tagReleased>0 ): print("main tagReleased", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
 
         if tagReleased==0: return
         tag=tagReleased
@@ -208,9 +199,7 @@ class ui_main():
             print("tag_back")
         elif tag == tag_ui_lds_home:
             self.ui_active = self.ui_lds_scan
-            print("tag_ui_lds_home")
         elif tag == tag_ui_lds_info:
-            print("ui_active.title" ,self.ui_active.title)
             self.ui_lds_Details.ui_previous=self.ui_active.title
             self.ui_active = self.ui_lds_Details  
         elif tag == tag_ui_lds_info_back:
@@ -223,7 +212,7 @@ class ui_main():
             elif ( self.ui_lds_Details.ui_previous.startswith("LDSBus 2Ch Relay")):   
                 self.ui_lds_Details.ui_previous=self.ui_active.title
                 self.ui_active = self.ui_relay
-            print("tag_ui_lds_info_back",self.ui_lds_Details.ui_previous)
+            #print("tag_ui_lds_info_back",self.ui_lds_Details.ui_previous)
         elif tag == tag_ui_lds_back:
  
             if ( self.ui_active.title=="LDSBus 4in1 Sensor"):   self.ui_active = self.ui_lds_scan
@@ -238,7 +227,7 @@ class ui_main():
             elif ( self.ui_active.title=="LDSBus CO2 Sensor(CO2)"):   self.ui_active = self.ui_co2_sensor
             elif ( self.ui_active.title=="LDSBus 2Ch Relay"):   self.ui_active = self.ui_lds_scan
             elif ( self.ui_lds_Details.ui_previous=="LDSBus 2Ch Relay"):   self.ui_active = self.ui_relay
-            print("tag_ui_lds_back",self.ui_active.title,self.ui_lds_Details.ui_previous)
+            #print("tag_ui_lds_back",self.ui_active.title,self.ui_lds_Details.ui_previous)
 
         elif tag == tag_ui_lds_4in1_t:
             self.ui_active = self.ui_4in1_sensor_t
@@ -254,7 +243,6 @@ class ui_main():
         elif tag == tag_ui_lds_co2_h:
             self.ui_active = self.ui_co2_sensor_h
         elif tag == tag_ui_lds_co2_a:
-            #self.ui_active = self.ui_co2_sensor_a
             self.ui_active = self.ui_co2_sensor_ambient
         elif tag == tag_ui_lds_co2_co2:
                 self.ui_active = self.ui_co2_sensor_co2
@@ -263,7 +251,7 @@ class ui_main():
             sensorType,lds=self.getType(0)
             self.LDSBus_Sensor.sensorType=sensorType
             self.LDSBus_Sensor.lds=lds
-            print("choose %d,  %s"% (self.LDSBus_Sensor.dataIndex,sensorType) )
+            #print("choose %d,  %s"% (self.LDSBus_Sensor.dataIndex,sensorType) )
             if sensorType=="LDSBus 4in1 Sensor" or sensorType=="LDSBus Thermocouple Sensor":
                 self.ui_active = self.ui_4in1_sensor
             elif sensorType.startswith("LDSBus CO2 Sensor"): self.ui_active = self.ui_co2_sensor
@@ -275,7 +263,7 @@ class ui_main():
             sensorType,lds=self.getType(1)
             self.LDSBus_Sensor.sensorType=sensorType
             self.LDSBus_Sensor.lds=lds
-            print("choose %d,  %s"% (self.LDSBus_Sensor.dataIndex,sensorType) )
+            #print("choose %d,  %s"% (self.LDSBus_Sensor.dataIndex,sensorType) )
             if sensorType=="LDSBus 4in1 Sensor" or sensorType=="LDSBus Thermocouple Sensor":
                 self.ui_active = self.ui_4in1_sensor
             elif sensorType.startswith("LDSBus CO2 Sensor"): self.ui_active = self.ui_co2_sensor
@@ -298,7 +286,7 @@ class ui_main():
             sensorType,lds=self.getType(3)
             self.LDSBus_Sensor.sensorType=sensorType
             self.LDSBus_Sensor.lds=lds
-            print("choose %d,  %s"% (self.LDSBus_Sensor.dataIndex,sensorType) )
+            #print("choose %d,  %s"% (self.LDSBus_Sensor.dataIndex,sensorType) )
             if sensorType=="LDSBus 4in1 Sensor" or sensorType=="LDSBus Thermocouple Sensor":
                 self.ui_active = self.ui_4in1_sensor
             elif sensorType.startswith("LDSBus CO2 Sensor"): self.ui_active = self.ui_co2_sensor

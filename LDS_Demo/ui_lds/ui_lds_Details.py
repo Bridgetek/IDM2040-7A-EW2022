@@ -9,8 +9,6 @@ from .ui_common import ui_common
 from .ui_config import ui_config
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -30,7 +28,6 @@ class ui_lds_Details(ui_config):
         self.title="LDSBus Details"
         self._rescan=True
         self.ui_previous=""
-        #self._rescan=False
 
     def event(self):
         eve = self.eve
@@ -68,12 +65,6 @@ class ui_lds_Details(ui_config):
         y = self.y0
         FONTSIZE = 29
         eve.cmd_text(x, y, 31, 0, self.title)
-
- 
-        #X=34 ,10 ,H=780,410,82
-        #X=278 ,10 ,H=460,242,34 
-        #print("%s ,X=%d ,%s ,H=%d,%d,%d  \n"%(self.title, self.layout.APP_X ,self.layout.APP_Y,  self.layout.APP_H,self.layout.APP_W, self.layout.MENU_W ) )
-
         self.drawBtn()
         self.event()
         
@@ -82,7 +73,6 @@ class ui_lds_Details(ui_config):
         y +=  ymargin
        
         distance = 40
-        #eve.ColorRGB(0, 0, 0)
         eve.ColorRGB(255, 255, 255)     
 
         eve.ColorRGB(170, 85, 0)

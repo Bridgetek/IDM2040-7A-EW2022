@@ -29,7 +29,6 @@ class ui_4in1_sensor(ui_common):
     temperature_sample_num = 0
     temperature_data=[[0, 0]] *temperature_MAX_SAMPLE
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
-        #super().__init__(eve,helper,gesture,layout,LDSBus_Sensor)
         ui_common.__init__(self,eve,helper,gesture,layout,LDSBus_Sensor)
 
         self.title="LDSBus 4in1 Sensor"
@@ -103,25 +102,7 @@ class ui_4in1_sensor(ui_common):
         eve.cmd_button(x5, y, btn_w, btn_h, 31, 0, "Back")
         eve.Tag(0)
 
-    def event(self):
-        eve = self.eve
-        layout = self.layout
-        ges = self.gesture
 
-        tag = ges.get().tagReleased
-        if ( tag>0 ): print("4in1 tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
-        if tag == tag_ui_lds_reset_data:
-           self._histroy=[]
-           self.humidity_data=[[0, 0]] * self.HUMIDITY_MAX_SAMPLE
-           self.humidity_sample_num = 0
-           self.temperature_data=[[0, 0]] * self.temperature_MAX_SAMPLE
-           self.temperature_sample_num = 0
-        elif tag == tag_ui_lds_data_gui:     
-            ui_4in1_sensor.data_gui=1
-            print("tag_ui_lds_data_gui")
-        elif tag == tag_ui_lds_data_text:     
-            ui_4in1_sensor.data_gui=0
-            print("tag_ui_lds_data_text")
 
 
     def processOne(self,lds,eve,x,y):
@@ -180,16 +161,6 @@ class ui_4in1_sensor(ui_common):
                             self.push_humidity(self.value_h)
                         elif  sensor['NAME'][0:1]=='M' and ui_4in1_sensor.data_gui==1: #Motion
                             self.value_m=float( sns_value['VALUE'])
-                if len(self._histroy ) >= self._maxLen:
-                    self._histroy = self._histroy [1:self._maxLen]
-                self._histroy .append(ss)
-
-                if ui_4in1_sensor.data_gui!=1:
-                    for item in self._histroy :
-                        self.eve.cmd_text(x+50, y, 28, 0, item)
-                        y+=distance
-                        #print("%s\n"%(item ) )
-                    #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
                 return 1
             else:
                 print ("%20s : %s ,ldsuid=%d" %  ("4in1 SENSOR PROCESS", "FAILED" ,ldsuid))
@@ -210,15 +181,12 @@ class ui_4in1_sensor(ui_common):
         eve.cmd_button(x+len(self.title)*FONTSIZE, y, self.btn_w, self.btn_h, 31, 0, "Info")
         if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)        
         self.drawBtn()
-        #self.event()
         ymargin = 50
         y +=  ymargin
         widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])      
         x+=50
         y+=20
         self.processOne(self.LDSBus_Sensor.lds,eve,x,y) 
-        if self.firstTime:
-            self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
         ms = time.monotonic_ns() / 1000_000
         if ms - self.last_timeout < self.readingInterval: return
         self.last_timeout =  time.monotonic_ns() / 1000_000

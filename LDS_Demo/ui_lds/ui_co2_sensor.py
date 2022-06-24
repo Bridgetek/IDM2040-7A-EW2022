@@ -1,6 +1,5 @@
 import time
 import math
-#import random
 from random import randint
 import json
 from .helper import helper
@@ -12,8 +11,6 @@ from .ui_common import ui_common
 from .ui_config import ui_config
 from .tags import *
 from . import datetime
-#from .scroller import scroller
-#from .dimension2d import polar_xy, clock_hand
 from .widgets import widgets_box, widgets_point
 
 import sys
@@ -32,8 +29,6 @@ class ui_co2_sensor(ui_common):
     temperature_data=[[0, 0]] *temperature_MAX_SAMPLE
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
         super().__init__(eve,helper,gesture,layout,LDSBus_Sensor)
-
-        #self.ui_main = ui_main
         self.title="LDSBus CO2 Sensor"
         self.value_co2=0 
         self.value_t=0 
@@ -107,26 +102,7 @@ class ui_co2_sensor(ui_common):
         eve.Tag(tag_ui_lds_back)
         eve.cmd_button(x5, y, btn_w, btn_h, 31, 0, "Back")
         eve.Tag(0)
-        
-    def event(self):
-        eve = self.eve
-        layout = self.layout
-        ges = self.gesture
-
-        tag = ges.get().tagReleased
-        if ( tag>0 ): print("4in1 tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
-        if tag == tag_ui_lds_reset_data:
-           self._histroy=[]
-           self.humidity_data=[[0, 0]] * self.HUMIDITY_MAX_SAMPLE
-           self.humidity_sample_num = 0
-           self.temperature_data=[[0, 0]] * self.temperature_MAX_SAMPLE
-           self.temperature_sample_num = 0
-        elif tag == tag_ui_lds_data_gui:     
-            ui_co2_sensor.data_gui=1
-            print("tag_ui_lds_data_gui")
-        elif tag == tag_ui_lds_data_text:     
-            ui_co2_sensor.data_gui=0
-            print("tag_ui_lds_data_text")
+    
     def processOne(self,lds,x,y):
         xHalf=410
         yHalf=205
@@ -168,7 +144,6 @@ class ui_co2_sensor(ui_common):
                 addCounter=2*(self.failCounter +1)
                 for said, sensor in enumerate(lds_json['SNS']):
                     sns_value=self.LDSBus_Sensor.LDSBus_SDK_ReadValue(ldsuid,sensor)
-                    #sns_value = self.LDSBus_Sensor.lds_bus.LDSBus_SDK_ReadValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']))
                     if sns_value is not None:
                         if len(ss) == 0:
                             ss="%s:%-5.2f %s "% (sensor['NAME'][0:1],  float(sns_value['VALUE']), sensor['UNIT'][0:1])
@@ -187,24 +162,13 @@ class ui_co2_sensor(ui_common):
                             if (co2!=0 ) and (co2!=self.value_co2):
                                 self.value_co2=co2
                             #print("CO2", sns_value['VALUE'])                          
-                if len(self._histroy ) >= self._maxLen:
-                    self._histroy = self._histroy [1:self._maxLen]
-                self._histroy .append(ss)
 
-                if ui_co2_sensor.data_gui!=1:
-                    for item in self._histroy :
-                        self.eve.cmd_text(x+50, y, 28, 0, item)
-                        y+=distance
-                        #print("%s\n"%(item ) )
-                #print("%d, %s \n"%(len(self._histroy ), self._histroy) )
                 return 1
             else:
                 #print ("%20s : %s ,ldsuid=%d" %  ("CO2 SENSOR PROCESS", "FAILED" ,ldsuid),   time.time())
                 return -1
 
     def preNext(self):
-        if self.firstTime:
-            self.firstTime=False; print("lds:",self.LDSBus_Sensor.lds)
         ms = time.monotonic_ns() / 1000_000
         if ms - self.last_timeout < self.readingInterval: return
         self.last_timeout =  time.monotonic_ns() / 1000_000      
@@ -227,7 +191,6 @@ class ui_co2_sensor(ui_common):
         eve.cmd_button(x+len(self.title)*FONTSIZE, y, self.btn_w, self.btn_h, 31, 0, "Info")
         if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)        
         self.drawBtn()
-        #self.event()
         ymargin = 50
         y +=  ymargin
         widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])      
