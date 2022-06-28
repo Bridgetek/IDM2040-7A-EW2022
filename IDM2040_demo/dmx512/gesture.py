@@ -4,11 +4,6 @@ from brteve.brt_eve_bt817_8 import BrtEve
 MIN_MOVE         = 15
 SWIPE_LIMIT      = 5
 
-
-# return value is the number of milliseconds that have elapsed since the system was started.
-def milis():
-    return round(time.monotonic_ns() / 1000_000)
-
 class Gesture_Touch():
     tagTrackTouched = 0
     tagPressed      = 0

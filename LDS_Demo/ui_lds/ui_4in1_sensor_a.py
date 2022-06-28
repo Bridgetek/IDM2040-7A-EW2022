@@ -12,12 +12,8 @@ from .ui_4in1_sensor import ui_4in1_sensor
 from .tags import *
 from . import datetime
 from .widgets import widgets_box, widgets_point
-
 import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 class ui_4in1_sensor_a(ui_4in1_sensor):
     data_gui=1
@@ -42,7 +38,6 @@ class ui_4in1_sensor_a(ui_4in1_sensor):
         eve.cmd_button(x+len(self.title)*FONTSIZE, y, self.btn_w, self.btn_h, 31, 0, "Info")
         if self.skipSensor: eve.cmd_text(x+70+len(self.title)*FONTSIZE, y, 28, 0, self.simulatorTitle)        
         self.drawBtn()
-        self.event()
         ymargin = 50
         y +=  ymargin
         widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])      

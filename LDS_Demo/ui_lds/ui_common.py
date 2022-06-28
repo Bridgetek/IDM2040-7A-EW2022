@@ -1,6 +1,5 @@
 import time
 import math
-#import random
 from random import randint
 import json
 from .helper import helper
@@ -12,12 +11,8 @@ from .ui_config import ui_config
 from .tags import *
 from . import datetime
 from .widgets import widgets_box, widgets_point
-
 import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 class ui_common(ui_config):
     data_gui=1
@@ -722,7 +717,8 @@ class ui_common(ui_config):
         else:        eve.Vertex2f(x+PADDING_X+37, y+PADDING_X) 
         eve.End() 
 
-    def snapshot2( self,title):
+    def snapshot2( self,title,block):
+        #block=60 is one typical 
         eve = self.eve
         block=60   #  -- 96000
         #block=480 # --- 768000

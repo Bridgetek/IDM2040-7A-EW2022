@@ -116,24 +116,6 @@ class audio_play():
         eve = self.eve
         ges = self.helper_gesture.renew()
         tag = ges.tagReleased
-#         if ges.isTouch:
-#             ms = time.monotonic_ns() / 1000_000
-#             if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
-#                 self.touchCounter+=1
-#                 if self.touchCounter>9:
-#                     self.touchCounter=0
-#                     self.longTouch=1
-#             else:
-#                 self.touchCounter=0
-#                 self.longTouch=0
-#             self.lastTouch=ms
-#         else:
-#                 self.touchCounter=0
-#                 self.longTouch=0                       
-#         if self.longTouch:
-#                 from main_menu.eve_tools import snapshot2
-#                 snapshot2(self.eve,"audio_"+str(self.snapCounter))
-#                 self.snapCounter+=1
                 
         if tag == tag_play: # play/pause is same button
             # blocking function

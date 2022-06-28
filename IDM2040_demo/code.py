@@ -4,30 +4,14 @@ import watchdog
 import time
 import sys
 from main_menu.brt_eve_rp2040_dmx import BrtEveRP2040_dmx as BrtEveRP2040
-
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
-
+from brteve.brt_eve_bt817_8 import BrtEve
 
 class main_app():
 
     def __init__(self):
         self.host = BrtEveRP2040()
         self.eve = BrtEve(self.host)
-        #self.eve = BrtEveExt(self.host)
-        #eve.init(resolution="1280x800", touch="goodix")
-        #self.eve.init(resolution="1280x800", touch="capacity")  # old device
         self.eve.init(resolution="800x480", touch="capacity")
-        #self.eve.calibrate()
-        # eve.wr32(eve.REG_TOUCH_TRANSFORM_A, 0xfffefefc) # pre setting for 1280x800 lcd
-        # eve.wr32(eve.REG_TOUCH_TRANSFORM_B, 0xfffffcbf)
-        # eve.wr32(eve.REG_TOUCH_TRANSFORM_C, 0x506adb4)
-        # eve.wr32(eve.REG_TOUCH_TRANSFORM_D, 0xfffffed1)
-        # eve.wr32(eve.REG_TOUCH_TRANSFORM_E, 0xfffefc79)
-        # eve.wr32(eve.REG_TOUCH_TRANSFORM_F, 0x32c3211)
-
         eve=self.eve
         self.x0=20
         self.y0=10

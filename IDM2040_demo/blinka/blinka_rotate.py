@@ -133,13 +133,5 @@ class blinka_rotate(object):
 if __name__ == '__main__':
     host = BrtEveRP2040()
     eve = BrtEve(host)
-    #eve.init(resolution="1280x800", touch="goodix")
     eve.init(resolution="800x480", touch="capacity")
     blinka_rotate(eve).run()
-#else:
-#     import bteve as eve
-#     from spidriver import SPIDriver
-#     gd = eve.Gameduino(SPIDriver(sys.argv[1]))
-#     assetdir = "assets/"
-#     gd.init()
-

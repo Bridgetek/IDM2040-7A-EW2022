@@ -22,10 +22,7 @@ from .ui_relay import ui_relay
 from .ui_lds_Details import ui_lds_Details
 from .LDSBus_Sensor import LDSBus_Sensor
 
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 # controler class
 class ui_main():
