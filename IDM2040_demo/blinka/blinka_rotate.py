@@ -84,6 +84,7 @@ class blinka_rotate(object):
                 x = scale * r * math.sin(th)
                 y = scale * r * math.cos(th)
                 gd.Vertex2f(x, y)
+        t=0
         while True:
             gd.VertexFormat(2)
             gd.ColorRGB(0x40, 0x50, 0x70)           
@@ -116,6 +117,7 @@ class blinka_rotate(object):
             if tag == tag_Back:     
                   break                         
             gd.swap()
+            t += 1
         eve=gd
         eve.cmd_dlstart()    
         eve.VertexFormat(2)
