@@ -1,8 +1,3 @@
-# Changed to use self lib brt_eve_rp2040_dmx.py instead of changing original   brt_eve_rp2040.py
-import os
-import board
-import busio
-import digitalio
 import sdcardio # pylint: disable=import-error
 import storage # pylint: disable=import-error
 
@@ -31,4 +26,4 @@ def snapshot2( eve,title,block):
                     print("error snapshotOne" ,i,address)
                     return -1
                 f.write(buf)
-    print("snapshot2 finish",total*block_size)
+    print("snapshot2 finish",file,total*block_size)

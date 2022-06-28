@@ -24,9 +24,6 @@ class ui_lds_scan(ui_config):
         self._rescan=True
         #self._rescan=False
  
-    def interrupt(self):
-        return 0
-
     def drawBtn(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)

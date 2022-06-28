@@ -33,9 +33,6 @@ class ui_lds_Details(ui_config):
         tag = ges.get().tagReleased
         if ( tag>0 ): print("lds_scan tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
 
- 
-    def interrupt(self):
-        return 0
 
     def drawBtn(self):
         eve = self.eve
