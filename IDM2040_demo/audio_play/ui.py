@@ -74,7 +74,7 @@ class ui():
         for img in self.images:
             self.images[img][4] = count
             count+=1
-        print('read all flash/8' , eve.RAM_G_SIZE/8)
+        #print('read all flash/8' , eve.RAM_G_SIZE/8)
         eve.cmd_flashread(0, 4096, eve.RAM_G_SIZE/8)  # 1024*1024/8 ==128k
 
 
@@ -86,11 +86,8 @@ class ui():
         address = 128*1024
         for index in self.imagesMCU:
             address = self.round_to_nearest(address, 4)
-            print(address,self.imagesMCU[index])
             self.imagesMCU[index][1] = address
-            print(address,self.imagesMCU[index])
             address = self.eve.write_file(address, self.imagesMCU[index][0])
-            print(address)
 
         eve.finish()
         self.useBK=1       
@@ -100,7 +97,6 @@ class ui():
         return (n + m - 1) // m * m
 
     def draw_asset(self, tag, index, x, y,fm):
-        #print(self.imagesMCU[index])
         helper = self.helper_img
         helper.image_draw_from_ram_g(self.imagesMCU[index][1],x, y,
             self.imagesMCU[index][2], self.imagesMCU[index][3],
@@ -124,8 +120,6 @@ class ui():
     def draw_img(self, img_id, tag = 0):
         eve = self.eve
         img = self.images[img_id]
-
-        #print('tag=', tag)
         if img[5] != 1:
             self.helper_img.image_setup_scale( img[5])
         self.helper_img.image_draw_from_ram_g(
