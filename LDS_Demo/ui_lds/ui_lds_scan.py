@@ -98,8 +98,5 @@ class ui_lds_scan(ui_config):
             y+=distance
             i=i+1
             widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])
-"""
-   {3: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus Thermocouple Sensor', 'MFG': '23062021', 'DID': '3', 'NICK': 'LDSBus Thermocouple Sensor', 'UID': 'LS01010105232113104', 'SNO': '000003EB', 'OBJ': '32769'}, 
-   1: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus 4in1 Sensor', 'MFG': '17092021', 'DID': '1', 'NICK': 'LDSBus 4in1 Sensor', 'UID': 'LS01010101272100039', 'SNO': '41363B88', 'OBJ': '32768'}}
-"""
+
             

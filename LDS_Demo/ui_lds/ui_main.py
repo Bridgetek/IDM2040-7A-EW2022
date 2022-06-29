@@ -15,13 +15,11 @@ from .ui_4in1_sensor_m import ui_4in1_sensor_m
 from .ui_co2_sensor import ui_co2_sensor
 from .ui_co2_sensor_t import ui_co2_sensor_t
 from .ui_co2_sensor_h import ui_co2_sensor_h
-#from .ui_co2_sensor_a import ui_co2_sensor_a
 from .ui_co2_sensor_ambient import ui_co2_sensor_ambient
 from .ui_co2_sensor_co2 import ui_co2_sensor_co2
 from .ui_relay import ui_relay
 from .ui_lds_Details import ui_lds_Details
 from .LDSBus_Sensor import LDSBus_Sensor
-
 from brteve.brt_eve_bt817_8 import BrtEve
 
 # controler class
@@ -32,8 +30,6 @@ class ui_main():
         self.gesture = gesture()
         self.layout = layout(eve, self.helper)
         ui_config.skipSensor=skipSensor
-
-
         self.LDSBus_Sensor=LDSBus_Sensor()
         self.ui_lds_scan=ui_lds_scan(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor,exit)
         self.ui_4in1_sensor=ui_4in1_sensor(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
@@ -47,11 +43,9 @@ class ui_main():
         self.ui_co2_sensor_ambient=ui_co2_sensor_ambient(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
         self.ui_co2_sensor_co2=ui_co2_sensor_co2(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
         self.ui_relay=ui_relay(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
-        self.ui_lds_Details=ui_lds_Details(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
-        
+        self.ui_lds_Details=ui_lds_Details(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)        
         self.ui_active = self.ui_lds_scan
         self.currType=''
-
         self.hBk512=4
         self.useBlend=1
         time.sleep(0.2)
@@ -68,7 +62,6 @@ class ui_main():
         self.flush()
         time.sleep(0.2)
         self.showScan()
-
         self.lastTouch=time.monotonic_ns() / 1000_000
         self.touchCounter=0
         self.longTouch=0 
@@ -272,8 +265,6 @@ class ui_main():
  
         return tag
 
- 
-
     def loop(self):
         self.eve.cmd_dlstart() #   
         self.eve.ClearColorRGB(0, 0, 0) 
@@ -281,11 +272,8 @@ class ui_main():
         self.eve.BlendFunc(self.eve.SRC_ALPHA, self.eve.ONE_MINUS_SRC_ALPHA) #reset to  default
         self.eve.ColorRGB(0, 0, 0)  
         self.eve.VertexFormat(2)
-
         self.ui_active.draw()
-
         ev = self.get_event()
-
         try:
             self.eve.Display()
             self.eve.cmd_swap()  #Co-processor faulty
