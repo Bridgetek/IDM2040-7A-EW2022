@@ -1,14 +1,11 @@
 import time
 from .helper import helper
 from .gesture import gesture
-from .datetime import hh_mm, hh_mm_ss_ms, milis, now, print_weekday, random
 from .layout import layout
 from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_config import ui_config
 from .tags import *
-from . import datetime
 from .widgets import widgets_box, widgets_point
-import sys
 from brteve.brt_eve_bt817_8 import BrtEve
 
 class ui_lds_scan(ui_config):

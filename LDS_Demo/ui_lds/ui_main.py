@@ -3,9 +3,7 @@ from ui_lds.gesture import gesture
 from ui_lds.layout import layout
 from ui_lds.helper import helper
 import time
-from .datetime import hh_mm, hh_mm_ss_ms, milis, now, print_weekday, random
 from .tags import *
-import sys
 from .ui_lds_scan import ui_lds_scan
 from .ui_4in1_sensor import ui_4in1_sensor
 from .ui_4in1_sensor_t import ui_4in1_sensor_t
