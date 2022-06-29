@@ -4,12 +4,8 @@ from .helper_gesture import helper_gesture
 from .helper_image import helper_image
 from .widgets import widgets_box, widgets_point
 from .helper_scroller import helper_scroller
-
 import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 _text_height = 30
 _text_font = 29
