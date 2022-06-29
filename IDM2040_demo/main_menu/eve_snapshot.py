@@ -1,5 +1,5 @@
-import sdcardio # pylint: disable=import-error
-import storage # pylint: disable=import-error
+import sdcardio  
+import storage  
 
 def snapshot2( eve,title,block):
     #block=60 is one typical 

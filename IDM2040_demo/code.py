@@ -1,8 +1,6 @@
 from main_menu.tags_all import *
 import microcontroller
-import watchdog
 import time
-import sys
 from main_menu.brt_eve_rp2040_dmx import BrtEveRP2040_dmx as BrtEveRP2040
 from brteve.brt_eve_bt817_8 import BrtEve
 
