@@ -1,13 +1,8 @@
 from brteve.brt_eve_bt817_8 import BrtEve
 from  main_menu.brt_eve_rp2040_dmx import BrtEveRP2040_dmx as BrtEveRP2040
-
-from  .gesture import gesture
-import supervisor
-import microcontroller
+from  image_viewer.gesture import gesture
 import math
 import time
-import array
-import ulab.numpy as np
 import board
 from .dmx512 import dmx512
 
