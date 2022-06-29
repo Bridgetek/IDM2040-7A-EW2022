@@ -21,13 +21,6 @@ class ui_lds_Details(ui_config):
         self._rescan=True
         self.ui_previous=""
 
-    def event(self):
-        eve = self.eve
-        layout = self.layout
-        ges = self.gesture
-        tag = ges.get().tagReleased
-        if ( tag>0 ): print("lds_scan tag", tag, self.gesture.get().tagReleased, self.gesture.get().tagPressed)
-
 
     def drawBtn(self):
         eve = self.eve
@@ -51,8 +44,7 @@ class ui_lds_Details(ui_config):
         y = self.y0
         FONTSIZE = 29
         eve.cmd_text(x, y, 31, 0, self.title)
-        self.drawBtn()
-        self.event()      
+        self.drawBtn()     
         xdistance=300
         ymargin = 70
         y +=  ymargin      

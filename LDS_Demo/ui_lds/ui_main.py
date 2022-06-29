@@ -115,7 +115,7 @@ class ui_main():
                 if self.touchCounter>5:
                     self.touchCounter=0
                     self.longTouch=1
-                    print("longTouch " ,self.longTouch)
+                    #print("longTouch " ,self.longTouch)
                     # from  main_menu.eve_snapshot import snapshot2
                     # snapshot2(eve,self.ui_active.title,60)
             else:

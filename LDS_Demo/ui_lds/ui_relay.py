@@ -2,15 +2,12 @@ import time
 import json
 from .helper import helper
 from .gesture import gesture
-from .datetime import hh_mm, hh_mm_ss_ms, milis, now, print_weekday, random
 from .layout import layout
 from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_common import ui_common
 from .ui_config import ui_config
 from .tags import *
-from . import datetime
 from .widgets import widgets_box, widgets_point
-import sys
 from brteve.brt_eve_bt817_8 import BrtEve
 
 class ui_relay(ui_config):
@@ -33,8 +30,6 @@ class ui_relay(ui_config):
         self.relayStatus={'Relay - CH 1':'1','Relay - CH 2':'0' ,'Current - CH 1':'0.000','Current - CH 2':'0.000'}
         self.last_timeout =  time.monotonic_ns() / 1000_000
  
-    def interrupt(self):
-        return 0
 
     def drawBtn(self):
         eve = self.eve
