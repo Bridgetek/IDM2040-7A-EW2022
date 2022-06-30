@@ -91,7 +91,6 @@ class ui_main():
         self.flush()
  
     def getType(self,cIndex):
-        mame=''
         i=0
         currLDS =None
         for index, lds in self.LDSBus_Sensor.lds_list.items():

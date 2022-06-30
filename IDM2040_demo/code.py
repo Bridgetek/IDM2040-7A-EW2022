@@ -17,9 +17,7 @@ class main_app():
         self.y1=120
         self.xmargin=100
         self.ymargin=50
-        self.lastTouch=time.monotonic_ns() / 1000_000
-        self.touchCounter=0
-        self.longTouch=0
+ 
         
     def drawBtn(self):
         eve = self.eve
@@ -73,12 +71,8 @@ class main_app():
             from image_viewer.image_viewer import image_viewer  
             spi1 = eve.spi_sdcard()
             eve.finish()
-            try:
-                app=image_viewer(eve)
-                app.deinit()
-                self.showFreeMem()
-            except  Exception as e:
-                print("Exception:",e)
+            app=image_viewer(eve)
+            app.deinit()
         elif tag == tag_audio_playback:
             from audio_play.audio_play import audio_play             
             audio_play(eve)
