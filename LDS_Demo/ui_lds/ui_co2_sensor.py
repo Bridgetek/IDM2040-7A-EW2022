@@ -103,20 +103,19 @@ class ui_co2_sensor(ui_common):
         if ui_co2_sensor.data_gui==1:
             self.eve.TagMask(1)
             self.eve.Tag(tag_ui_lds_co2_t)
-            if (self.useBlend==1): self.eve.SaveContext() 
+            self.eve.SaveContext() 
             self.barGraphHis(x = x, y=y, w = width, h = boxH, border=1,  data=ui_co2_sensor.temperature_data,scale=1,blend=1)
-            if (self.useBlend==1):
-                self.blendBk(x=x,y=y,w=width,h = boxH, border=1 ,blend=1) 
-                self.eve.RestoreContext()
+            self.blendBk(x=x,y=y,w=width,h = boxH, border=1 ,blend=1) 
+            self.eve.RestoreContext()
             self.coordinateMarker(x,y,width,boxH,1,1,0,tvalue=self.value_t,MaxMin=2)  #4-->2
             self.eve.Tag(tag_ui_lds_co2_a)
-            if (self.useBlend==1): self.eve.SaveContext() 
+            self.eve.SaveContext() 
             self.circle_box(x =x+xHalf, y=y, w = width, h = boxH, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=70, hwarning=900, value=self.value_a)
-            if (self.useBlend==1):self.eve.RestoreContext()
+            self.eve.RestoreContext()
             self.eve.Tag(tag_ui_lds_co2_h)
-            if (self.useBlend==1): self.eve.SaveContext() 
+            self.eve.SaveContext() 
             self.statitics_box(x = x+xHalf, y=y+yHalf, w = width, h = boxH, border=1,data=ui_co2_sensor.humidity_data ,tvalue=self.value_h,MaxMin=2)  #4-->2
-            if (self.useBlend==1):self.eve.RestoreContext()
+            self.eve.RestoreContext()
             self.eve.Tag(tag_ui_lds_co2_co2)
             self.circle_box(x =x, y=y+yHalf, w = width, h = boxH, border=1, title="CO2",unit="ppm", vmin=0, vmax=30000, lwarning=400, hwarning=27000, value=self.value_co2)
 

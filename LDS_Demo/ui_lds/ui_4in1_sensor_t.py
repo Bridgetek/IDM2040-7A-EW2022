@@ -15,10 +15,6 @@ class ui_4in1_sensor_t(ui_4in1_sensor):
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor:LDSBus_Sensor):
         super().__init__(eve , helper, gesture, layout,LDSBus_Sensor)
         self.title="LDSBus 4in1 Sensor(Temperature)"        
-        self.useBlend=1
-
-    def interrupt(self):
-        return 0
 
 
     def boxE(self, x, y, w, h, border=1):
@@ -33,15 +29,12 @@ class ui_4in1_sensor_t(ui_4in1_sensor):
     def processOne(self,lds,x,y):
         boxW=self.boxW 
         boxH=self.boxH
-        if (self.useBlend==1): self.eve.SaveContext() 
+        self.eve.SaveContext() 
         self.barGraphHis(x = x, y=y, w = boxW, h = boxH, border=1,data=ui_4in1_sensor.temperature_data,scale=2, blend=1) 
-        if (self.useBlend==1):
-            self.blendBk(x=x,y=y,w=boxW,h = boxH, border=1,scale=2  ,blend=1) 
-            self.eve.RestoreContext()
+        self.blendBk(x=x,y=y,w=boxW,h = boxH, border=1,scale=2  ,blend=1) 
+        self.eve.RestoreContext()
         self.coordinateMarker(x,y,2*boxW,2*boxH,0,2,0 ,tvalue=self.value_t)
-        PADDING_X=30
-
-                        
+        PADDING_X=30                       
                  
     def draw(self):
         eve = self.eve

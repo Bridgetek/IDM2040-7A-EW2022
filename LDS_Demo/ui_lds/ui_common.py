@@ -37,7 +37,6 @@ class ui_common(ui_config):
         self.hData=2
         self.hBk=3
         self.hBk512=4
-        self.useBlend=1
         self.boxW=272
         self.boxH=180
         self.last_timeout =  time.monotonic_ns() / 1000_000
@@ -516,11 +515,8 @@ class ui_common(ui_config):
             eve.Vertex2f(x , y+h )
             eve.Vertex2f(x , y  )    
 
-
-
-        if (blend==1) and (self.useBlend==1 ):
+        if (blend==1) :
             eve.BlendFunc(eve.SRC_ALPHA, eve.ZERO) # Reset blend ,new 
-
 
         eve.ColorRGB(255, 255, 255)
         if scale==1:
@@ -627,7 +623,7 @@ class ui_common(ui_config):
         MAX_VALUE=80  #40-80
        
         #self.coordinateMarker(x,y,w*scale,h*scale,1,scale,blend)
-        if (blend==1) and (self.useBlend==1 ):
+        if (blend==1):
             eve.BlendFunc(eve.SRC_ALPHA, eve.ZERO) # Reset blend ,new     
 
         eve.BitmapHandle(0)
@@ -686,9 +682,9 @@ class ui_common(ui_config):
         bmAdd=1024*1024 - 200*1024
          
 
-        if (blend==0) or (self.useBlend==0):return
+        if (blend==0) :return
          
-        if (blend==1) and (self.useBlend==1 ):
+        if (blend==1) :
            eve.BlendFunc(eve.DST_ALPHA,eve.ONE_MINUS_DST_ALPHA)
 
         if scale==1:

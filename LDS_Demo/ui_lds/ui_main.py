@@ -45,7 +45,6 @@ class ui_main():
         self.ui_active = self.ui_lds_scan
         self.currType=''
         self.hBk512=4
-        self.useBlend=1
         time.sleep(0.2)
         assetdir = "ui_lds/"
         eve.cmd_dlstart()  
