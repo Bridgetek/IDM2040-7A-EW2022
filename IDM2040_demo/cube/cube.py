@@ -22,7 +22,6 @@ def normalize(vector):
         mag += e*e
     if mag == 0:
         return vector, 0
-
     mag = math.sqrt(mag)
     for i in range(0,len(vector)):
         vector[i] = vector[i] / mag
