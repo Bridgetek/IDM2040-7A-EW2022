@@ -4,8 +4,12 @@ from .helper_gesture import helper_gesture
 from .helper_image import helper_image
 from .widgets import widgets_box, widgets_point
 from .helper_scroller import helper_scroller
+
 import sys
-from brteve.brt_eve_bt817_8 import BrtEve
+if sys.implementation.name == "circuitpython":
+    from brteve.brt_eve_bt817_8 import BrtEve
+else:
+    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
 
 _text_height = 30
 _text_font = 29
@@ -70,20 +74,22 @@ class ui():
         for img in self.images:
             self.images[img][4] = count
             count+=1
-        #print('read all flash/8' , eve.RAM_G_SIZE/8)
         eve.cmd_flashread(0, 4096, eve.RAM_G_SIZE/8)  # 1024*1024/8 ==128k
 
 
         self.imagesMCU = {
-            # id                 location                                                         ramg address  width  height
+            # id          location                                            ramg address  width  height
             'background':['audio_play/song_bk_800x480_COMPRESSED_RGBA_ASTC_8x8_KHR.raw',0,800,480],
         }
 
         address = 128*1024
         for index in self.imagesMCU:
             address = self.round_to_nearest(address, 4)
+            print(address,self.imagesMCU[index])
             self.imagesMCU[index][1] = address
+            print(address,self.imagesMCU[index])
             address = self.eve.write_file(address, self.imagesMCU[index][0])
+            print(address)
 
         eve.finish()
         self.useBK=1       
@@ -93,6 +99,7 @@ class ui():
         return (n + m - 1) // m * m
 
     def draw_asset(self, tag, index, x, y,fm):
+        #print(self.imagesMCU[index])
         helper = self.helper_img
         helper.image_draw_from_ram_g(self.imagesMCU[index][1],x, y,
             self.imagesMCU[index][2], self.imagesMCU[index][3],
@@ -116,6 +123,8 @@ class ui():
     def draw_img(self, img_id, tag = 0):
         eve = self.eve
         img = self.images[img_id]
+
+        #print('tag=', tag)
         if img[5] != 1:
             self.helper_img.image_setup_scale( img[5])
         self.helper_img.image_draw_from_ram_g(
@@ -133,8 +142,6 @@ class ui():
             self.files_released = 1
         else:
             offset_y, veloc = self.helper_scroller.get_offset_velocity(touch_y)
-            #print("helper_scroller touch_y offset_y isSwipe",tag,touch_y,offset_y  ,self.helper_gesture.get().isSwipe )
-
 
         box_w = 500
         x = max(w/2 - box_w/4 , 0)
@@ -163,7 +170,6 @@ class ui():
                     ms = time.monotonic_ns() / 1000_000
                     self.selected_timeout = ms
                     self.files_released = 1
-                    #print("selected count,touch_y offset_y isSwipe",tag,count,touch_y,offset_y  ,self.helper_gesture.get().isSwipe )
 
             if self.files[self.file_playing_id] == i:
                 eve.ColorRGB(0, 255, 0)
