@@ -6,11 +6,7 @@ from .helper_gesture import helper_gesture
 from .ui import ui
 from .audio_eve import audio_eve
 
-import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_rp2040 import BrtEveRP2040
 
 class audio_play():
     def __init__(self, eve: BrtEve) -> None:

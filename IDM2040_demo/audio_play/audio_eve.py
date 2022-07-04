@@ -1,12 +1,7 @@
 import time
 from .tags import *
 from .helper_gesture import helper_gesture
-
-import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_rp2040 import BrtEveRP2040
 
 _state_play = 0
 _state_stop = 1
