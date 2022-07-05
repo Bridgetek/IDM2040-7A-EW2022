@@ -27,13 +27,11 @@ class ui_common(ui_config):
         self.temp_value=0        
         self.hr_value=0
         self.last_hr=0
-        self.useGradient=0
         self._COLOR_GREEN=[0x90, 0xC8, 0x3A]
         self._COLOR_GRAY=[0x33, 0x33, 0x33]
         self._COLOR_WARNING=[0xD4, 0x21, 0x33]
         self._COLOR_YELLOW=[0xFF, 0xFF, 0x00]
         self.hData=2
-        self.hBk=3
         self.hBk512=4
         self.boxW=272
         self.boxH=180
@@ -575,8 +573,6 @@ class ui_common(ui_config):
         numchunks=1
         bmWidth=96
         bmAdd=eve.RAM_G+256
-
- 
         PADDING_Y = PADDING_X = 30
         MAX_VALUE=80  #40-80
        
@@ -596,10 +592,7 @@ class ui_common(ui_config):
         else:
             eve.cmd_setbitmap(bmAdd, eve.BARGRAPH, SAMAPP_BARGRAPH_ARRAY_SIZE, bmWidth)
             eve.BitmapTransformA(0,128)  #double
-            #eve.BitmapTransformE(0,128)
             eve.BitmapTransformE(0,int(self.bb ))
-#             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,0,int(self.aa*bmWidth))
-#             eve.BitmapSizeH(1,0)
             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,SAMAPP_BARGRAPH_ARRAY_SIZE*2,int(self.aa*bmWidth))
             eve.BitmapSizeH(0,0)
  
@@ -651,10 +644,6 @@ class ui_common(ui_config):
             eve.BitmapSizeH(0,0)
         elif scale==2:
             eve.BitmapHandle(self.hBk512)
-            #eve.BitmapTransformA(0,128)  #double
-            #eve.BitmapTransformE(0,int(self.bb ))
-#             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,0,int(self.aa*bmWidth))
-#             eve.BitmapSizeH(1,0)
             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,SAMAPP_BARGRAPH_ARRAY_SIZE*2,int(self.aa*bmWidth))
             eve.BitmapSizeH(0,0)
 
