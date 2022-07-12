@@ -10,6 +10,8 @@ class main_app():
         self.host = BrtEveRP2040()
         self.eve = BrtEve(self.host)
         self.eve.init(resolution="800x480", touch="capacity")
+        #self.eve.init(resolution="800x480_NoSquare", touch="capacity")
+        #self.eve.cmd_hsf(800)
         eve=self.eve
         self.x0=20
         self.y0=10
@@ -17,7 +19,9 @@ class main_app():
         self.y1=120
         self.xmargin=100
         self.ymargin=50
- 
+        self.lastTouch=time.monotonic_ns() / 1000_000
+        self.touchCounter=0
+        self.longTouch=0
         
     def drawBtn(self):
         eve = self.eve
@@ -65,8 +69,13 @@ class main_app():
                 from blinka.blinka_rotate import blinka_rotate  
                 blinka_rotate(eve).run()
         elif tag == tag_dmx512_demo:
-            from  dmx512.dmx_ui import dmx_ui  
-            dmx_ui(eve).loop()                  
+            from  dmx512.dmx_ui import dmx_ui
+            #Enable HSF for non-square pixel support
+            eve.init(resolution="800x480_NoSquare", touch="capacity")
+            eve.cmd_hsf(800)
+            dmx_ui(eve).loop()
+            eve.init(resolution="800x480", touch="capacity")
+            eve.cmd_hsf(0)
         elif tag == tag_image_View:
             from image_viewer.image_viewer import image_viewer  
             spi1 = eve.spi_sdcard()

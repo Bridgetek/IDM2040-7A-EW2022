@@ -1,8 +1,11 @@
 import sys
 from .widgets import widgets_dialog_yes_no
-import sys
-from brteve.brt_eve_bt817_8 import BrtEve
 
+import sys
+if sys.implementation.name == "circuitpython":
+    from brteve.brt_eve_bt817_8 import BrtEve
+else:
+    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
 
 def flash_video(eve: BrtEve, file, blob=''):
     eve.storage.write_flash_with_progressbar(file, 4096)
@@ -46,7 +49,7 @@ def reserve(eve, num):
     while eve.space < num:
         #add some delay to detect touch event
         i+=1
-        if (i>300):
+        if (i>600):
             touch_x = eve.rd16(eve.REG_TOUCH_SCREEN_XY + 2)
             touch_y = eve.rd16(eve.REG_TOUCH_SCREEN_XY + 4)
             if touch_x != 32768:
@@ -63,8 +66,7 @@ def play_video_from_eve_flash(eve: BrtEve, file, blob=''):
     # if yes == True:
     #     flash_video(eve, file, blob)
     print("play_video_from_eve_flash")
-    mp = eve.movie_player_from_flash(1149568)
-    #mp = eve.movie_player_from_flash(1242432)
+    mp = eve.movie_player_from_flash(1267520)
     #mp.play()
     play(eve)
     
